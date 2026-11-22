@@ -1,0 +1,6 @@
+{
+  "name": "understreet",
+  "compatibility_date": "2026-11-01",
+  "assets": { "directory": "./public" },
+  "preview_urls": false
+}
