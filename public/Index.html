@@ -43,18 +43,21 @@ html,body{margin:0;height:100%;background:var(--ink);color:var(--bone);font-fami
   padding:9px 16px;border-radius:8px;background:rgba(10,7,6,.85);border:1px solid rgba(255,184,77,.5);
   font-size:18px;font-weight:600;line-height:1.2;opacity:0;transition:opacity .35s;text-wrap:balance}
 #toast.on{opacity:1}
+#danger{left:50%;top:30%;transform:translateX(-50%);display:flex;align-items:center;gap:8px;padding:6px 14px 6px 8px;border-radius:999px;
+  background:rgba(170,20,10,.88);font-size:19px;font-weight:700;letter-spacing:.14em;opacity:0;transition:opacity .15s}
+#dArrow{width:28px;height:28px;display:grid;place-items:center;border-radius:50%;background:#fff;color:#a01008;font-size:19px;line-height:1}
 #hint{left:50%;top:58%;transform:translate(-50%,-50%);text-align:center;font-size:20px;font-weight:600;
   letter-spacing:.05em;line-height:1.5;text-shadow:0 2px 6px #000;transition:opacity .6s}
 #hint span{color:var(--amber)}
-.overlay{position:fixed;inset:0;z-index:5;display:none;align-items:center;justify-content:center;
+.overlay{position:fixed;inset:0;z-index:5;display:none;align-items:flex-start;justify-content:center;
   background:rgba(10,7,6,.9);padding:22px;touch-action:auto;overflow:auto}
 .overlay.on{display:flex}
 #start{background:
   radial-gradient(ellipse at 50% 120%,rgba(255,184,77,.16),transparent 60%),
   repeating-linear-gradient(0deg,rgba(239,228,207,.035) 0 1px,transparent 1px 34px),
   repeating-linear-gradient(90deg,rgba(239,228,207,.035) 0 1px,transparent 1px 34px),var(--ink)}
-.card{width:100%;max-width:400px}
-h1{margin:0;font-size:clamp(38px,12vw,64px);font-weight:700;letter-spacing:.04em;line-height:.9;text-transform:uppercase}
+.card{width:100%;max-width:400px;margin:auto}
+h1{margin:0;font-size:clamp(36px,11.4vw,64px);font-weight:700;letter-spacing:.04em;line-height:.9;text-transform:uppercase}
 h1 em{display:block;font-style:normal;color:var(--amber);transform:scaleY(-1);opacity:.5;height:.5em;overflow:hidden;
   -webkit-mask-image:linear-gradient(#000,transparent);mask-image:linear-gradient(#000,transparent)}
 h2{margin:0 0 4px;font-size:30px;letter-spacing:.06em;text-transform:uppercase}
@@ -68,10 +71,22 @@ button.big.primary{background:var(--amber);border-color:var(--amber);color:var(-
 button.big.primary small{color:rgba(10,7,6,.7)}
 button.big:disabled{opacity:.45;cursor:default}
 button:focus-visible{outline:3px solid var(--teal);outline-offset:2px}
+.lblhd{margin:18px 0 2px;font-size:12px;letter-spacing:.22em;color:var(--dim);font-weight:600}
 .fine{margin-top:14px;font-size:14px;line-height:1.35;color:var(--dim);font-weight:500;text-wrap:pretty}
 .fine a{color:var(--dim)}
 #status{min-height:1.4em;margin-top:12px;font-size:17px;font-weight:600;color:var(--teal);letter-spacing:.03em}
 #bigmap .card{max-width:560px;text-align:center}
+#hosp{background:#e9eef0;color:#16252b}
+#hosp h2{color:#0d6b73} #hosp .pitch{color:#16252b} #hosp .fine{color:#557078;font-size:15px;margin-top:8px}
+#hospEmoji{font-size:54px;line-height:1.1}
+#sudoku{display:grid;grid-template-columns:repeat(9,minmax(0,1fr));width:min(100%,380px);margin:0 auto;border:3px solid #16252b;background:#16252b;gap:1px}
+.sc{aspect-ratio:1;min-width:0;border:0;padding:0;background:#fff;color:#0d6b73;font:600 22px var(--font);display:grid;place-items:center;cursor:pointer}
+.sc.giv{color:#16252b;font-weight:700;background:#f1f4f5}
+.sc.same{background:#d5ecee} .sc.sel{background:#ffd98a} .sc.bad{color:#c42a1a;background:#ffe1dc}
+.sc:nth-child(3n):not(:nth-child(9n)){margin-right:2px}
+.sc:nth-child(n+19):nth-child(-n+27),.sc:nth-child(n+46):nth-child(-n+54){margin-bottom:2px}
+#sudPad{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;width:min(100%,380px);margin:12px auto 0}
+#sudPad button{padding:10px 0;border-radius:8px;border:2px solid #16252b;background:#fff;color:#16252b;font:700 22px var(--font);cursor:pointer}
 #big{width:100%;aspect-ratio:1;border-radius:8px;border:2px solid rgba(239,228,207,.5);background:#120d0a;image-rendering:pixelated}
 #bigmap p{margin:8px 0 0;font-size:16px;color:var(--dim);font-weight:500}
 @media (prefers-reduced-motion:reduce){#toast,#hint,#bar i{transition:none}}
@@ -82,7 +97,7 @@ button:focus-visible{outline:3px solid var(--teal);outline-offset:2px}
 <div id="vig"></div>
 
 <div id="plate" class="hud">
-  <div class="lbl">BENEATH</div>
+  <div class="lbl" id="lbl">BENEATH</div>
   <div id="street">—</div>
   <div id="fed"><div class="row"><span>FED</span><span id="fedPct">100%</span></div><div id="bar"><i></i></div></div>
   <div id="stats"></div>
@@ -91,17 +106,20 @@ button:focus-visible{outline:3px solid var(--teal);outline-offset:2px}
 <button id="menuBtn" class="hud" aria-label="Menu">☰</button>
 <div id="hint" class="hud">Swipe <span>up</span> to walk<br>Drag <span>sideways</span> to turn</div>
 <div id="toast" class="hud" role="status"></div>
+<div id="danger" class="hud"><div id="dArrow">↑</div><span>CAR</span></div>
 <div id="scent" class="hud"><div id="arrow">↑</div><span id="scentTxt"></span></div>
 
 <div id="start" class="overlay on">
   <div class="card">
     <h1>Understreet<em aria-hidden="true">Understreet</em></h1>
-    <p class="pitch">Your neighbourhood, turned inside out. <b>Streets are tunnels.</b> <b>Buildings are bottomless pits.</b> Dinner is in a cave.</p>
+    <p class="pitch">Your neighbourhood, turned inside out. <b>Streets are tunnels.</b> <b>Buildings are shafts of open sky.</b> Dinner is in a cave. Step on a <b>▲ pad</b> to surface, where the cars are real and the only way back is a <b>▼ pad</b> somewhere else.</p>
     <button class="big primary" id="btnLoc">Dig under my streets<small>Builds the maze from the real map around you</small></button>
     <button class="big" id="btnInv">Invent a city<small>A made-up town, different every time</small></button>
     <button class="big" id="btnBack" style="display:none">Back to current maze</button>
+    <div id="placesHd" class="lblhd" style="display:none">YOUR PLACES</div>
+    <div id="places"></div>
     <div id="status" role="status"></div>
-    <p class="fine" id="locNote">Using your streets asks for your location once. It is rounded to roughly 100&nbsp;m and sent only to OpenStreetMap's public map service to fetch nearby streets. Nothing is saved.</p>
+    <p class="fine" id="locNote">Using your streets asks for your location once. It is rounded to roughly 100&nbsp;m and sent only to OpenStreetMap's public map service to fetch nearby streets. Places you dig are saved in this browser only, so you can come back to them.</p>
   </div>
 </div>
 
@@ -112,7 +130,21 @@ button:focus-visible{outline:3px solid var(--teal);outline-offset:2px}
     <button class="big primary" id="btnResume">Keep exploring</button>
     <button class="big" id="btnNew">Change map<small>Use your real streets, or invent a new city</small></button>
     <button class="big" id="btnSound">Sound: on</button>
+    <button class="big" id="btnSky">Sky: real time</button>
     <p class="fine" id="attrib"></p>
+  </div>
+</div>
+
+<div id="hosp" class="overlay">
+  <div class="card" style="text-align:center">
+    <div id="hospEmoji" aria-hidden="true"></div>
+    <h2 id="hospTitle"></h2>
+    <p class="pitch" id="hospText" style="margin:6px 0 14px;font-size:18px"></p>
+    <div id="hospPlay">
+      <div id="sudoku" role="grid" aria-label="Sudoku"></div>
+      <div id="sudPad"></div>
+      <div id="sudLeft" class="fine"></div>
+    </div>
   </div>
 </div>
 
@@ -129,9 +161,9 @@ button:focus-visible{outline:3px solid var(--teal);outline-offset:2px}
 (() => {
 'use strict';
 /* ---------- constants ---------- */
-const N = 192, CELL_M = 3;                 // grid size, metres per cell
-const ROCK = 0, TUN = 1, PIT = 2, CAVE = 3;
-const EYE = 0.5, CEIL = 1.15, DEPTH = 7, MAXD = 42, TS = 64;
+const T = 96, N = T*3;                      // a tile is 96 cells; the loaded window is 3x3 tiles
+const ROCK = 0, TUN = 1, PIT = 2, CAVE = 3, PADUP = 4, PADDN = 5;   // PIT = a building footprint
+const EYE = 0.5, CEIL = 1.15, SH = 3.4, MAXD = 42, TS = 64;   // SH: how far the sky shafts rise above the tunnel ceiling
 const $ = id => document.getElementById(id);
 
 /* ---------- small utilities ---------- */
@@ -169,11 +201,14 @@ const texFloor=makeTex((x,y)=>{
 /* ---------- world state ---------- */
 let W=null;            // current world
 const P={x:0,y:0,a:0,v:0,tilt:0,bobT:0};
+let realm=0, grace=0, surfaced=0, escapes=0, flattened=0;   // realm 0 = underside, 1 = topside
+const cars=[];
 let energy=1, running=false, walked=0, stepAcc=0, lowWarned=false, doneWarned=false;
 
 /* ---------- world building (shared by real + invented maps) ---------- */
 function buildWorld(src){
   const cells=new Uint8Array(N*N), nameIdx=new Uint16Array(N*N), names=['the rock'];
+  const rw=new Uint8Array(N*N), hgt=new Float32Array(N*N), bid=new Uint16Array(N*N); let bCount=0;
   const inb=(x,y)=>x>=1&&y>=1&&x<N-1&&y<N-1;
   // roads -> tunnels
   for(const rd of src.roads){
@@ -187,12 +222,14 @@ function buildWorld(src){
         const cx=ax+(bx-ax)*s/steps, cy=ay+(by-ay)*s/steps;
         const x0=Math.round(cx-w/2), y0=Math.round(cy-w/2);
         for(let yy=y0;yy<y0+w;yy++)for(let xx=x0;xx<x0+w;xx++)
-          if(inb(xx,yy)){const k=yy*N+xx; if(cells[k]!==TUN||w>=2)nameIdx[k]=ni; cells[k]=TUN}
+          if(inb(xx,yy)){const k=yy*N+xx; if(cells[k]!==TUN||w>=2)nameIdx[k]=ni; cells[k]=TUN; const cw=rd.car?w:1; if(cw>rw[k])rw[k]=cw}
       }
     }
   }
   // buildings -> pits (scanline polygon fill)
   for(const poly of src.buildings){
+    bCount++; const bh=1.4+(poly.levels>0?Math.min(14,poly.levels):1+((hash(bCount*977+5)*2.6)|0))*1.0;
+    const lbl=poly.label||'a building'; let bi=names.indexOf(lbl); if(bi<0){bi=names.length;names.push(lbl)}
     let minY=1e9,maxY=-1e9; for(const p of poly){if(p[1]<minY)minY=p[1];if(p[1]>maxY)maxY=p[1]}
     const y0=Math.max(1,Math.floor(minY)), y1=Math.min(N-2,Math.ceil(maxY));
     for(let y=y0;y<=y1;y++){
@@ -204,7 +241,7 @@ function buildWorld(src){
       xs.sort((a,b)=>a-b);
       for(let k=0;k+1<xs.length;k+=2){
         const xa=Math.max(1,Math.ceil(xs[k]-.5)), xb=Math.min(N-2,Math.floor(xs[k+1]-.5));
-        for(let x=xa;x<=xb;x++)if(cells[y*N+x]===ROCK)cells[y*N+x]=PIT;
+        for(let x=xa;x<=xb;x++)if(cells[y*N+x]===ROCK){cells[y*N+x]=PIT;nameIdx[y*N+x]=bi;hgt[y*N+x]=bh;bid[y*N+x]=bCount&65535}
       }
     }
   }
@@ -225,55 +262,85 @@ function buildWorld(src){
       }
     }
   }
-  // start: nearest tunnel to centre
+  // connected tunnel networks; start in the biggest one unless told exactly where
+  const comp=new Int32Array(N*N); let nComp=0,bigId=0,bigSize=0;
+  for(let k0=0;k0<N*N;k0++){ if(cells[k0]!==TUN||comp[k0])continue;
+    const id=++nComp, st=[k0]; comp[k0]=id; let size=0;
+    while(st.length){const k=st.pop();size++;for(const o of [1,-1,N,-N]){const q=k+o;if(cells[q]===TUN&&!comp[q]){comp[q]=id;st.push(q)}}}
+    if(size>bigSize){bigSize=size;bigId=id}
+  }
+  const want=src.startAt||{x:N/2,y:N/2};
   let sx=-1,sy=-1,best=1e9;
-  for(let y=1;y<N-1;y++)for(let x=1;x<N-1;x++)if(cells[y*N+x]===TUN){
-    const d=(x-N/2)**2+(y-N/2)**2; if(d<best){best=d;sx=x;sy=y}}
+  if(want.exact&&inb(want.x|0,want.y|0)&&cells[(want.y|0)*N+(want.x|0)]!==ROCK){sx=want.x|0;sy=want.y|0}
+  else for(let y=1;y<N-1;y++)for(let x=1;x<N-1;x++)if(comp[y*N+x]===bigId&&bigId){
+    const d=(x+.5-want.x)**2+(y+.5-want.y)**2; if(d<best){best=d;sx=x;sy=y}}
   if(sx<0)return null;
-  // food caves
-  const caves=[], caveAt=new Map();
-  function carveCave(px,py,info,radius){
+  // alcoves off the tunnels: food caves and teleport pads
+  const caves=[], caveAt=new Map(), ups=[], downs=[];
+  function carveCave(px,py,info,radius,type){
     let cand=[];
     const r=radius, x0=Math.max(1,Math.floor(px-r)),x1=Math.min(N-2,Math.ceil(px+r));
     const y0=Math.max(1,Math.floor(py-r)),y1=Math.min(N-2,Math.ceil(py+r));
     for(let y=y0;y<=y1;y++)for(let x=x0;x<=x1;x++)if(cells[y*N+x]===TUN){
       const d=(x+.5-px)**2+(y+.5-py)**2; if(d<=r*r)cand.push([d,x,y])}
-    cand.sort((a,b)=>a[0]-b[0]);
+    cand.sort((a,b)=>a[0]-b[0]||a[1]-b[1]||a[2]-b[2]);
     for(const c of cand){
       const dirs=D4.slice().sort((a,b)=>((px-c[1]-.5)*b[0]+(py-c[2]-.5)*b[1])-((px-c[1]-.5)*a[0]+(py-c[2]-.5)*a[1]));
       for(const d of dirs){
         const xx=c[1]+d[0],yy=c[2]+d[1]; if(xx<2||yy<2||xx>N-3||yy>N-3)continue;
         const k=yy*N+xx; if(cells[k]!==ROCK)continue;
-        let near=false; for(const e of D4)if(cells[k+e[1]*N+e[0]]===CAVE)near=true;
+        let near=false; for(const e of D4)if(cells[k+e[1]*N+e[0]]>=CAVE)near=true;
         if(near)continue;
-        cells[k]=CAVE; nameIdx[k]=nameIdx[c[2]*N+c[1]];
-        const cv=Object.assign({x:xx,y:yy,idx:k,found:false},info); caves.push(cv); caveAt.set(k,cv); return cv;
+        cells[k]=type||CAVE; nameIdx[k]=nameIdx[c[2]*N+c[1]];
+        const cv=Object.assign({},info,{x:xx,y:yy,idx:k,found:false}); if(!type){caves.push(cv); caveAt.set(k,cv)} return cv;
       }
     }
     return null;
   }
-  for(const p of src.pois){ if(caves.length>=40)break; if(p.x>2&&p.y>2&&p.x<N-3&&p.y<N-3)carveCave(p.x,p.y,p,9); }
+  // Everything is placed tile by tile from the tile's own seed, so a tile always gets the same caves and pads
+  // no matter which neighbours are loaded with it. That is what lets saved places merge.
+  const per=[]; for(let i=0;i<9;i++)per.push({pois:[],tun:[],road:[]});
+  for(const q of src.pois){const i=Math.floor(q.x/T),j=Math.floor(q.y/T); if(i>=0&&i<3&&j>=0&&j<3)per[j*3+i].pois.push(q)}
+  for(let y=6;y<N-6;y++)for(let x=6;x<N-6;x++){const k=y*N+x; if(cells[k]!==TUN)continue;
+    const lx=x%T,ly=y%T; if(lx<6||ly<6||lx>T-7||ly>T-7)continue;
+    const t=per[((y/T)|0)*3+((x/T)|0)]; t.tun.push(k); if(rw[k]>=2)t.road.push(k)}
+  const g=src.grid;
+  for(let ti=0;ti<9;ti++){
+    const t=per[ti], i=ti%3, j=(ti/3)|0, tk=g?g.z+'/'+(g.x0+i)+'/'+(g.y0+j):'v'+ti;
+    const rng=mulberry32(g?(Math.imul(g.x0+i,73856093)^Math.imul(g.y0+j,19349663)):((src.seed|0)+ti*7919));
+    t.pois.sort((a,b)=>String(a.id)<String(b.id)?-1:1);
+    let n=0; const mine=[];
+    for(const q of t.pois){ if(n>=10)break; if(q.x>2&&q.y>2&&q.x<N-3&&q.y<N-3){const cv=carveCave(q.x,q.y,q,9); if(cv){cv.tk=tk;mine.push(cv);n++}} }
+    for(let a=0;n<2&&a<40&&t.tun.length;a++){                       // wild grottos where the map has no food
+      const k=t.tun[(rng()*t.tun.length)|0], x=k%N, y=(k/N)|0, gi=GROTTOS[(rng()*GROTTOS.length)|0];
+      if(mine.some(c=>Math.hypot(c.x-x,c.y-y)<16))continue;
+      const cv=carveCave(x+.5,y+.5,{id:'g'+tk+':'+n,name:gi[0],emoji:gi[1],blurb:gi[2],wild:true},1.5);
+      if(cv){cv.tk=tk;mine.push(cv);n++}
+    }
+    const pool=t.road.length>20?t.road:t.tun;                       // one ▲ pad and one ▼ pad per tile, never the same spot
+    if(pool.length>10){
+      let up=null; for(let a=0;a<30&&!up;a++){const k=pool[(rng()*pool.length)|0]; up=carveCave(k%N+.5,((k/N)|0)+.5,{},1.5,PADUP)}
+      if(up){ up.tk=tk; ups.push(up);
+        let dn=null; for(let a=0;a<70&&!dn;a++){const k=pool[(rng()*pool.length)|0], x=k%N, y=(k/N)|0;
+          if(Math.hypot(x-up.x,y-up.y)<(a<45?30:12))continue; dn=carveCave(x+.5,y+.5,{},1.5,PADDN)}
+        if(dn){dn.tk=tk;downs.push(dn)} }
+    }
+  }
   // reachability from start
   const reach=new Uint8Array(N*N);
-  function flood(){
-    reach.fill(0); const st=[sy*N+sx]; reach[sy*N+sx]=1;
+  { const st=[sy*N+sx]; reach[sy*N+sx]=1;
     while(st.length){const k=st.pop();
-      for(const o of [1,-1,N,-N]){const q=k+o;if(!reach[q]&&(cells[q]===TUN||cells[q]===CAVE)){reach[q]=1;st.push(q)}}}
-  }
-  flood();
-  // make sure there is always something to eat: wild grottos
-  const rng=mulberry32(src.seed||12345);
-  let live=caves.filter(c=>reach[c.idx]);
-  const tun=[]; for(let k=0;k<N*N;k++)if(reach[k]&&cells[k]===TUN)tun.push(k);
-  let guard=0;
-  while(live.length<7&&guard++<600&&tun.length){
-    const k=tun[(rng()*tun.length)|0], x=k%N, y=(k/N)|0;
-    if(Math.hypot(x-sx,y-sy)<10)continue;
-    if(live.some(c=>Math.hypot(c.x-x,c.y-y)<16))continue;
-    const g=GROTTOS[guard%GROTTOS.length];
-    const cv=carveCave(x+.5,y+.5,{name:g[0],emoji:g[1],blurb:g[2],wild:true},1.5);
-    if(cv){reach[cv.idx]=1;live.push(cv)}
-  }
+      for(const o of [1,-1,N,-N]){const q=k+o;if(!reach[q]&&cells[q]!==ROCK){reach[q]=1;st.push(q)}}} }
+  const live=caves.filter(c=>reach[c.idx]);
+  for(const list of [ups,downs])for(let i=list.length-1;i>=0;i--)if(!reach[list[i].idx])list.splice(i,1);
+  const glow2=new Float32Array(N*N);
+  for(const c of ups)for(let dy=-3;dy<=3;dy++)for(let dx=-3;dx<=3;dx++){
+    const gl=1-Math.hypot(dx,dy)/3.6, k=(c.y+dy)*N+c.x+dx; if(gl>glow2[k])glow2[k]=gl }
+  // roads cars can use
+  const drive=[];
+  for(const rd of src.roads){ if(!rd.car||rd.pts.length<2)continue;
+    const cum=[0]; for(let i=1;i<rd.pts.length;i++)cum.push(cum[i-1]+Math.hypot(rd.pts[i][0]-rd.pts[i-1][0],rd.pts[i][1]-rd.pts[i-1][1]));
+    if(cum[cum.length-1]>6)drive.push({pts:rd.pts,cum,len:cum[cum.length-1],w:rd.w}) }
   let total=0; for(let k=0;k<N*N;k++)if(reach[k])total++;
   // glow from caves
   const glow=new Float32Array(N*N);
@@ -281,12 +348,18 @@ function buildWorld(src){
     const x=c.x+dx,y=c.y+dy; if(!inb(x,y))continue;
     const g=1-Math.hypot(dx,dy)/4.6; if(g>glow[y*N+x])glow[y*N+x]=g;
   }
+  // daylight falling through the shafts, spilling a little into the tunnels around them
+  const skyL=new Float32Array(N*N);
+  for(let y=2;y<N-2;y++)for(let x=2;x<N-2;x++){const k=y*N+x; if(cells[k]===ROCK)continue;
+    if(cells[k]===PIT){skyL[k]=1;continue}
+    let m=0; for(let dy=-2;dy<=2;dy++)for(let dx=-2;dx<=2;dx++)if(cells[k+dy*N+dx]===PIT){const v=.62*(1-Math.hypot(dx,dy)/2.9);if(v>m)m=v}
+    skyL[k]=m}
   // facing: longest open run
   let ang=0,run=-1;
   D4.forEach((d,i)=>{let n=0;while(n<60&&cells[(sy+d[1]*(n+1))*N+sx+d[0]*(n+1)]===TUN)n++;
     if(n>run){run=n;ang=Math.atan2(d[1],d[0])}});
-  return {cells,nameIdx,names,glow,caves:live,caveAt,reach,total,seen:new Uint8Array(N*N),seenCount:0,
-    start:{x:sx+.5,y:sy+.5,a:ang},title:src.title,real:!!src.real,found:0};
+  return {cells,nameIdx,names,glow,glow2,skyL,rw,hgt,bid,ups,downs,drive,driveLeft:!!src.driveLeft,caves:live,caveAt,reach,total,seen:new Uint8Array(N*N),seenCount:0,
+    start:{x:sx+.5,y:sy+.5,a:ang},title:src.title,real:!!src.real,found:0,cellM:src.cellM||3,grid:src.grid||null};
 }
 
 const GROTTOS=[
@@ -325,21 +398,21 @@ function inventCity(seed){
   const node=[]; for(let i=0;i<nx;i++){node.push([]);for(let j=0;j<ny;j++)node[i].push(rot(xs[i]+(r()-.5)*3.5,ys[j]+(r()-.5)*3.5))}
   const roads=[];
   for(let i=0;i<nx;i++){const art=artX.has(i),w=art?3:(r()<.8?2:1),name=sname();let cur=[];
-    for(let j=0;j<ny;j++){cur.push(node[i][j]); if(j===ny-1||(!art&&r()<.17)){if(cur.length>1)roads.push({pts:cur,w,name});cur=[]}}}
+    for(let j=0;j<ny;j++){cur.push(node[i][j]); if(j===ny-1||(!art&&r()<.17)){if(cur.length>1)roads.push({pts:cur,w,name,car:w>=2});cur=[]}}}
   for(let j=0;j<ny;j++){const art=artY.has(j),w=art?3:(r()<.8?2:1),name=sname();let cur=[];
-    for(let i=0;i<nx;i++){cur.push(node[i][j]); if(i===nx-1||(!art&&r()<.17)){if(cur.length>1)roads.push({pts:cur,w,name});cur=[]}}}
+    for(let i=0;i<nx;i++){cur.push(node[i][j]); if(i===nx-1||(!art&&r()<.17)){if(cur.length>1)roads.push({pts:cur,w,name,car:w>=2});cur=[]}}}
   // one wandering diagonal avenue
   {const pts=[];let y=(r()-.5)*120;const sl=(r()-.5)*1.4;
     for(let x=-150;x<=150;x+=25){pts.push(rot(x,y));y+=sl*25+(r()-.5)*14}
-    roads.push({pts,w:3,name:pick(r,ST_A)+' Parade'})}
+    roads.push({pts,w:3,name:pick(r,ST_A)+' Parade',car:true})}
   const buildings=[],pois=[];
-  const rect=(x0,y0,x1,y1)=>[rot(x0,y0),rot(x1,y0),rot(x1,y1),rot(x0,y1)];
+  const rect=(x0,y0,x1,y1)=>{const a=[rot(x0,y0),rot(x1,y0),rot(x1,y1),rot(x0,y1)];const big=(x1-x0)*(y1-y0)>120;a.levels=big?2+((r()*3)|0):1+((r()*2.4)|0);a.label=big?pick(r,['a warehouse','a market hall','a depot','an arcade']):pick(r,['a house','a house','a terrace','a shop','a flat','a workshop']);return a};
   for(let i=0;i<nx-1;i++)for(let j=0;j<ny-1;j++){
     const m=2.3, X0=xs[i]+m,X1=xs[i+1]-m,Y0=ys[j]+m,Y1=ys[j+1]-m; if(X1-X0<5||Y1-Y0<5)continue;
     const busy=artX.has(i)||artX.has(i+1)||artY.has(j)||artY.has(j+1), t=r();
     if(t<.09)continue;                                    // park: solid rock
     const addPoi=(x,y)=>{ if(r()<(busy?.3:.05)){const k=pick(r,INV_KINDS),nm=inventName(r,k[0]);
-      const f=foodInfo(k[0],k[1],nm); const p=rot(x,y); pois.push(Object.assign({x:p[0],y:p[1]},f))}};
+      const f=foodInfo(k[0],k[1],nm); const p=rot(x,y); pois.push(Object.assign({x:p[0],y:p[1],id:'i'+pois.length},f))}};
     if(t<.2){ buildings.push(rect(X0+r()*2,Y0+r()*2,X1-r()*2,Y1-r()*2)); addPoi(X0-1,(Y0+Y1)/2); addPoi((X0+X1)/2,Y0-1); continue; }
     const gap=t<.6?0:.8+r()*1.4;
     const dep=()=>3+r()*2.5;
@@ -355,7 +428,7 @@ function inventCity(seed){
   // spread POIs so they are not all in one corner
   for(let i=pois.length-1;i>0;i--){const j=(r()*(i+1))|0;[pois[i],pois[j]]=[pois[j],pois[i]]}
   const town=pick(r,TOWN_A)+pick(r,TOWN_B);
-  return {roads,buildings,pois:pois.filter(p=>p.x>4&&p.y>4&&p.x<N-5&&p.y<N-5).slice(0,20),title:town,seed,real:false};
+  return {roads,buildings,pois:pois.filter(p=>p.x>4&&p.y>4&&p.x<N-5&&p.y<N-5).slice(0,36),title:town,seed,real:false,driveLeft:tzDrivesLeft()};
 }
 const ST_A=['Marrow','Tallow','Gantry','Quill','Cinder','Wren','Saltbush','Pike','Hollow','Copper','Lantern','Mallee','Bluegum','Tanner','Ferry','Abbot','Kiln','Larder','Wattle','Mason','Orchard','Signal','Drover','Candle','Anchor','Thistle','Ironbark','Gull','Paper','Cooper'];
 const ST_B=['Street','Street','Street','Road','Road','Lane','Avenue','Row','Way','Crescent','Place','Terrace'];
@@ -380,42 +453,108 @@ const ROAD_W={motorway:3,trunk:3,primary:3,secondary:3,motorway_link:2,trunk_lin
   tertiary:2,tertiary_link:2,residential:2,unclassified:2,living_street:2,pedestrian:2,road:2,busway:2};
 const ROAD_LBL={footway:'a footpath',path:'a footpath',steps:'a stairway',service:'a back lane',cycleway:'a cycle path',
   track:'a dirt track',pedestrian:'a walkway',bridleway:'a bridle path',corridor:'a corridor'};
-function osmToSrc(els,lat0,lon0){
-  const kx=Math.cos(lat0*Math.PI/180)*111320/CELL_M, ky=110540/CELL_M;
-  const toC=g=>[(g.lon-lon0)*kx+N/2, -(g.lat-lat0)*ky+N/2];
-  const roads=[],buildings=[],pois=[],seen=new Set();
-  const poi=(t,x,y)=>{const kind=t.amenity&&FOOD_KIND[t.amenity]?t.amenity:t.shop; if(!FOOD_KIND[kind])return;
-    const key=(t.name||'')+'|'+Math.round(x)+'|'+Math.round(y); if(seen.has(key))return; seen.add(key);
-    pois.push(Object.assign({x,y},foodInfo(kind,t.cuisine,t.name)))};
+const BLD_LBL={house:'a house',detached:'a house',semidetached_house:'a house',terrace:'a terrace',residential:'a home',apartments:'an apartment block',
+  retail:'a shop',commercial:'an office',office:'an office',industrial:'a factory',warehouse:'a warehouse',church:'a church',school:'a school',
+  garage:'a garage',garages:'a row of garages',shed:'a shed',hotel:'a hotel',hospital:'a hospital',university:'a university hall',train_station:'a station',roof:'a canopy'};
+// Which side of the road? Rough boxes for the left-driving parts of the world; everywhere else drives on the right.
+function drivesOnLeft(la,lo){
+  const box=(s,w,n,e)=>la>=s&&la<=n&&lo>=w&&lo<=e;
+  if(box(49.9,-11,61,1.77)&&!(la<50.5&&lo>-1.5)&&!(la<51&&lo>1.45))return true;   // UK, Ireland (not the French coast)
+  return box(-48,112,-9,179.9)       // Australia, New Zealand, PNG
+    ||box(-11,95,6,141)             // Indonesia, Timor
+    ||box(0.8,99.5,7.5,119.5)       // Malaysia, Singapore, Brunei
+    ||box(5.5,97.3,20.5,105.7)      // Thailand
+    ||box(22.1,113.8,22.6,114.5)    // Hong Kong, Macau
+    ||box(24,122.9,46,146)          // Japan
+    ||box(5.8,60.8,37.1,97.4)       // India, Pakistan, Bangladesh, Sri Lanka, Nepal
+    ||box(-35,11.5,-8,41)           // southern and eastern Africa
+    ||box(-4.8,29.3,4.7,41.9)       // Kenya, Uganda, Tanzania
+    ||box(34.5,32.2,35.8,34.7);     // Cyprus
+}
+function tzDrivesLeft(){
+  try{const z=Intl.DateTimeFormat().resolvedOptions().timeZone||'';
+    return /^(Australia\/|Pacific\/(Auckland|Chatham|Fiji|Port_Moresby)|Europe\/(London|Dublin|Belfast|Jersey|Guernsey|Isle_of_Man)|Asia\/(Tokyo|Kolkata|Calcutta|Karachi|Dhaka|Colombo|Kathmandu|Bangkok|Singapore|Kuala_Lumpur|Jakarta|Hong_Kong|Macau)|Africa\/(Johannesburg|Nairobi|Harare|Lusaka|Maputo|Windhoek|Gaborone|Dar_es_Salaam|Kampala))/.test(z)}catch(e){return false}
+}
+/* Fixed world grid: standard web-map tiles (zoom 17, or 16 far from the equator), 96 cells each.
+   Every tile is fetched once, kept in IndexedDB, and stitched 3x3 into the loaded window. */
+const zFor=lat=>Math.cos(lat*Math.PI/180)<.6?16:17;
+const lon2x=(lon,z)=>(lon+180)/360*2**z;
+const lat2y=(lat,z)=>(1-Math.asinh(Math.tan(lat*Math.PI/180))/Math.PI)/2*2**z;
+const x2lon=(x,z)=>x/2**z*360-180;
+const y2lat=(y,z)=>Math.atan(Math.sinh(Math.PI*(1-2*y/2**z)))*180/Math.PI;
+const tkey=(z,x,y)=>z+'/'+x+'/'+y;
+function elsToTiles(els,z,want){                   // want: Map key -> empty tile record to fill
+  const r2=v=>Math.round(v*100)/100, seenPoi=new Set();
+  const G=g=>[lon2x(g.lon,z),lat2y(g.lat,z)];
+  const each=(pts,fn)=>{ let x0=1e9,x1=-1e9,y0=1e9,y1=-1e9; for(const q of pts){if(q[0]<x0)x0=q[0];if(q[0]>x1)x1=q[0];if(q[1]<y0)y0=q[1];if(q[1]>y1)y1=q[1]}
+    const e=4/T; for(let ty=Math.floor(y0-e);ty<=Math.floor(y1+e);ty++)for(let tx=Math.floor(x0-e);tx<=Math.floor(x1+e);tx++){
+      const t=want.get(tkey(z,tx,ty)); if(t){const flat=[];for(const q of pts)flat.push(r2((q[0]-tx)*T),r2((q[1]-ty)*T)); fn(t,flat)} } };
+  const poi=(id,t,X,Y)=>{ const kind=t.amenity&&FOOD_KIND[t.amenity]?t.amenity:t.shop; if(!FOOD_KIND[kind]||seenPoi.has(id))return; seenPoi.add(id);
+    const tx=Math.floor(X),ty=Math.floor(Y),tile=want.get(tkey(z,tx,ty)); if(!tile)return;
+    const f=foodInfo(kind,t.cuisine,t.name); tile.pois.push({id,x:r2((X-tx)*T),y:r2((Y-ty)*T),name:f.name,emoji:f.emoji,blurb:f.blurb}) };
   for(const el of els){
     const t=el.tags||{};
-    if(el.type==='node'){ if(el.lat!=null){const c=toC(el);poi(t,c[0],c[1])} continue; }
+    if(el.type==='node'){ if(el.lat!=null){const c=G(el);poi('n'+el.id,t,c[0],c[1])} continue; }
     if(el.type!=='way'||!el.geometry||el.geometry.length<2)continue;
-    const pts=el.geometry.filter(Boolean).map(toC);
+    const pts=el.geometry.filter(Boolean).map(G), id='w'+el.id;
     if(t.highway){
       if(/proposed|construction|abandoned|razed|platform|rest_area|elevator/.test(t.highway)||t.area==='yes')continue;
-      roads.push({pts,w:ROAD_W[t.highway]||1,name:t.name||ROAD_LBL[t.highway]||'an unnamed street'});
-    }else if(t.building){ if(pts.length>=3)buildings.push(pts); }
-    if(t.amenity||t.shop){let x=0,y=0;for(const p of pts){x+=p[0];y+=p[1]}poi(t,x/pts.length,y/pts.length)}
+      const w=ROAD_W[t.highway]||1, car=w>=2&&t.highway!=='pedestrian'&&t.highway!=='busway';
+      each(pts,(tile,flat)=>tile.roads.push({id,p:flat,w,n:t.name||ROAD_LBL[t.highway]||'an unnamed street',c:car?1:0,named:t.name?1:0}));
+    }else if(t.building&&pts.length>=3){
+      const lv=parseFloat(t['building:levels'])||(parseFloat(t.height)/3)||0;
+      const lb=t.name||(t['addr:housenumber']&&t['addr:street']?t['addr:housenumber']+' '+t['addr:street']:BLD_LBL[t.building]||'a building');
+      each(pts,(tile,flat)=>tile.bld.push({id,p:flat,l:lb,v:lv}));
+    }
+    if(t.amenity||t.shop){let x=0,y=0;for(const q of pts){x+=q[0];y+=q[1]}poi(id,t,x/pts.length,y/pts.length)}
   }
-  // nearest POIs first, so the caves close to the player always make the cut
-  pois.sort((a,b)=>((a.x-N/2)**2+(a.y-N/2)**2)-((b.x-N/2)**2+(b.y-N/2)**2));
-  return {roads,buildings,pois,title:'your streets',seed:(Math.abs(lat0*1e3)|0)*7919+(Math.abs(lon0*1e3)|0),real:true};
+  for(const tile of want.values()){ let bestN='',bl=0; for(const r of tile.roads)if(r.named&&r.c&&r.p.length>bl){bl=r.p.length;bestN=r.n}
+    if(!bestN)for(const r of tile.roads)if(r.named&&r.p.length>bl){bl=r.p.length;bestN=r.n}
+    tile.label=bestN||'Unnamed ground'; }
 }
-async function fetchOSM(lat,lon){
-  const R=380, a=`(around:${R},${lat},${lon})`;
-  const q=`[out:json][timeout:25];(way[highway]${a};way[building]${a};node[amenity~"${FOOD_RE}"]${a};way[amenity~"${FOOD_RE}"]${a};node[shop~"${SHOP_RE}"]${a};way[shop~"${SHOP_RE}"]${a};);out geom qt;`;
-  let lastErr;
-  for(const url of ['https://overpass-api.de/api/interpreter','https://overpass.kumi.systems/api/interpreter']){
-    const ac=new AbortController(), tm=setTimeout(()=>ac.abort(),28000);
-    try{
-      const res=await fetch(url,{method:'POST',body:'data='+encodeURIComponent(q),
-        headers:{'Content-Type':'application/x-www-form-urlencoded'},signal:ac.signal});
-      if(!res.ok)throw new Error('map service said '+res.status);
-      const j=await res.json(); clearTimeout(tm); return j.elements||[];
-    }catch(e){lastErr=e}finally{clearTimeout(tm)}
+function tilesToSrc(z,cx,cy,getTile){              // stitch the 3x3 window around tile (cx,cy)
+  const roads=[],buildings=[],pois=[],seen=new Set(), x0=cx-1, y0=cy-1;
+  const un=(flat,dx,dy)=>{const a=[];for(let i=0;i<flat.length;i+=2)a.push([flat[i]+dx,flat[i+1]+dy]);return a};
+  for(let j=0;j<3;j++)for(let i=0;i<3;i++){
+    const t=getTile(tkey(z,x0+i,y0+j)); if(!t)continue; const dx=i*T, dy=j*T;
+    for(const r of t.roads){ if(seen.has(r.id))continue; seen.add(r.id); roads.push({pts:un(r.p,dx,dy),w:r.w,name:r.n,car:!!r.c}) }
+    for(const b of t.bld){ if(seen.has(b.id))continue; seen.add(b.id); const a=un(b.p,dx,dy); a.label=b.l; a.levels=b.v; buildings.push(a) }
+    for(const q of t.pois){ if(seen.has(q.id))continue; seen.add(q.id); pois.push({id:q.id,x:q.x+dx,y:q.y+dy,name:q.name,emoji:q.emoji,blurb:q.blurb}) }
   }
-  throw lastErr||new Error('map service unreachable');
+  const lat=y2lat(cy+.5,z), lon=x2lon(cx+.5,z);
+  return {roads,buildings,pois,real:true,title:'your streets',driveLeft:drivesOnLeft(lat,lon),
+    grid:{z,x0,y0},cellM:40075016.686*Math.cos(lat*Math.PI/180)/2**z/T};
+}
+function osmApiToEls(j){           // main OSM API gives ways as node-id lists: join them up
+  const nodes=new Map(), out=[];
+  for(const e of j.elements||[])if(e.type==='node'){nodes.set(e.id,e); if(e.tags)out.push(e)}
+  for(const e of j.elements||[])if(e.type==='way'&&e.nodes)
+    out.push({type:'way',id:e.id,tags:e.tags,geometry:e.nodes.map(id=>nodes.get(id)).filter(Boolean)});
+  return out;
+}
+async function getJSON(url,opts,ms){
+  const ac=new AbortController(), tm=setTimeout(()=>ac.abort(),ms), host=new URL(url).hostname;
+  try{
+    const res=await fetch(url,Object.assign({signal:ac.signal},opts));
+    if(!res.ok)throw new Error(res.status===429?'busy (429)':'error '+res.status);
+    return await res.json();
+  }catch(e){throw new Error(host+': '+(e&&e.name==='AbortError'?'timed out':(e&&e.message)||'unreachable'))}
+  finally{clearTimeout(tm)}
+}
+let fetchOSM=async function(bb,onTry){                 // bb: {s,w,n,e} in degrees
+  const S=bb.s.toFixed(5),Nn=bb.n.toFixed(5),Wd=bb.w.toFixed(5),E=bb.e.toFixed(5);
+  // 1. Overpass (a bounding box is far cheaper for the server than a radius search); ask two servers at once
+  const q=`[out:json][timeout:15][bbox:${S},${Wd},${Nn},${E}];(way[highway];way[building];node[amenity~"${FOOD_RE}"];way[amenity~"${FOOD_RE}"];node[shop~"${SHOP_RE}"];way[shop~"${SHOP_RE}"];);out geom qt;`;
+  const ask=url=>getJSON(url,{method:'POST',body:'data='+encodeURIComponent(q),headers:{'Content-Type':'application/x-www-form-urlencoded'}},16000)
+    .then(j=>{const els=j.elements||[]; if(!els.length&&j.remark)throw new Error(new URL(url).hostname+': query failed'); return els});
+  if(onTry)onTry('the map servers');
+  let err;
+  try{ return await Promise.any(['https://overpass-api.de/api/interpreter','https://overpass.private.coffee/api/interpreter','https://overpass.kumi.systems/api/interpreter'].map(ask)); }
+  catch(e){ err=(e.errors&&e.errors[0])||e; }
+  // 2. Fall back to OpenStreetMap's own API, which is steadier
+  if(onTry)onTry('openstreetmap.org directly');
+  try{ return osmApiToEls(await getJSON(`https://api.openstreetmap.org/api/0.6/map.json?bbox=${Wd},${S},${E},${Nn}`,{},25000)); }
+  catch(e2){ throw new Error(err.message+'; '+e2.message); }
 }
 function locationBlocked(){
   if(!('geolocation' in navigator)||!window.isSecureContext)return true;
@@ -444,28 +583,44 @@ const mapCv=document.createElement('canvas'); mapCv.width=mapCv.height=N;
 const mapCtx=mapCv.getContext('2d'); let mapImg=mapCtx.createImageData(N,N), map32=new Uint32Array(mapImg.data.buffer), mapDirty=true;
 
 /* ---------- renderer ---------- */
-let fogK=.16;
-function pitPix(u,dp,d,seed,side,fk){
-  const deep=dp>=DEPTH?0:1-dp/DEPTH;
-  const col=(u*2)|0, row=(dp*1.35)|0, fu=u*2-col, fv=dp*1.35-row;
-  if(fu>.24&&fu<.76&&fv>.28&&fv<.74){
-    const h=hash(seed*31+col*7919+row*104729);
-    if(h>.52){
-      const e=(.3+.7*deep)*(.35+.65/(1+d*.07));
-      return h>.9 ? 0xff000000|((235*e)<<16)|((200*e)<<8)|(150*e) : 0xff000000|((70*e)<<16)|((172*e)<<8)|(255*e);
-    }
-    return 0xff000000|((20*deep)<<16)|((13*deep)<<8)|(10*deep);
-  }
-  let c=(.22+.78*deep)/(1+d*d*fk*.6)*(side?.78:1); if(dp<.07)c*=1.9;
-  return 0xff000000|((62*c)<<16)|((66*c)<<8)|(78*c);
+let fogK=.16, skyMode=0;
+const SKY={zen:[0,0,0],hor:[0,0,0],lit:[0,0,0],win:.9,stars:false,amb:1};
+function setSky(){
+  const d=new Date(), h=d.getHours()+d.getMinutes()/60;
+  const ph=skyMode?skyMode:(h>=7&&h<17?1:(h>=5&&h<19.5?2:3));
+  if(ph===1){SKY.zen=[70,140,235];SKY.hor=[185,215,250];SKY.lit=[1.0,.97,.88];SKY.win=.96;SKY.stars=false;SKY.amb=1}
+  else if(ph===2){SKY.zen=[60,70,150];SKY.hor=[255,150,84];SKY.lit=[.9,.6,.42];SKY.win=.72;SKY.stars=false;SKY.amb=.74}
+  else{SKY.zen=[7,11,34];SKY.hor=[26,34,78];SKY.lit=[.36,.46,.74];SKY.win=.5;SKY.stars=true;SKY.amb=.3}
 }
-function render3D(){
-  const cells=W.cells, glow=W.glow, buf=buf32;
-  buf.fill(0xff050304);
+setSky(); setInterval(setSky,60000);
+function shaftPix(u,hh,d,seed,side){                      // inside wall of a shaft, hh = height above the tunnel ceiling
+  const up=hh/SH, fade=(d>=MAXD?0:1-d/MAXD)/(1+d*.025), L=SKY.lit;
+  const col=(u*2)|0, row=(hh*1.3)|0, fu=u*2-col, fv=hh*1.3-row;
+  if(fu>.26&&fu<.74&&fv>.3&&fv<.76&&hh>.25){
+    const h=hash(seed*31+col*7919+row*104729);
+    if(h>SKY.win){const e=.95*fade; return 0xff000000|((80*e)<<16)|((178*e)<<8)|(255*e)}
+    const k=(.1+.2*up)*fade; return 0xff000000|((120*k*L[2])<<16)|((126*k*L[1])<<8)|(132*k*L[0]);
+  }
+  let k=(.42+.58*up)*fade*(side?.8:1); if(fv<.07)k*=.8;
+  return 0xff000000|((168*k*L[2])<<16)|((176*k*L[1])<<8)|(186*k*L[0]);
+}
+function skyRows(x,a,b,hor,s,az){
+  const buf=buf32,Z=SKY.zen,Hh=SKY.hor,stars=SKY.stars; if(b>RH)b=RH;
+  for(let y=a<0?0:a;y<b;y++){
+    const el=(hor-y)/s, t=el>2.6?1:el<0?0:el/2.6;
+    if(stars&&el>.05&&hash(az*7919+((el*46)|0)*104729)>.9905){buf[y*RW+x]=0xffffffff;continue}
+    buf[y*RW+x]=0xff000000|((Hh[2]+(Z[2]-Hh[2])*t)<<16)|((Hh[1]+(Z[1]-Hh[1])*t)<<8)|(Hh[0]+(Z[0]-Hh[0])*t);
+  }
+}
+/* ---------- topside renderer: open sky, solid buildings, hedged-in streets ---------- */
+const BRICK=[[176,98,74],[204,190,164],[152,152,158],[124,88,64],[198,172,124],[142,66,54],[110,120,130],[214,206,196]];
+function renderTop(){
+  const cells=W.cells, hgt=W.hgt, bid=W.bid, rw=W.rw, buf=buf32;
   const px=P.x, py=P.y, dirX=Math.cos(P.a), dirY=Math.sin(P.a), plX=-dirY*PLANE, plY=dirX*PLANE;
   const s=RW/(2*PLANE), bob=Math.sin(P.bobT*Math.PI*2)*RH*.006;
-  const hor=Math.round(RH/2+P.tilt+bob), eyeS=EYE*s, ceilS=(CEIL-EYE)*s, fk=fogK*fogK;
-  const rR=texRock.R,rG=texRock.G,rB=texRock.B,fR=texFloor.R,fG=texFloor.G,fB=texFloor.B;
+  const hor=Math.round(RH/2+P.tilt+bob), eyeS=EYE*s, fk=.16*.16, FAR=64;
+  const rR=texRock.R,rG=texRock.G,fR=texFloor.R,fG=texFloor.G,fB=texFloor.B;
+  const Hh=SKY.hor, amb=SKY.amb, LR=SKY.lit[0]*amb, LG=SKY.lit[1]*amb, LB=SKY.lit[2]*amb, lampK=1-amb*.85, night=SKY.stars, Z=SKY.zen;
   for(let x=0;x<RW;x++){
     const camX=2*(x+.5)/RW-1, rdx=dirX+plX*camX, rdy=dirY+plY*camX;
     let mx=px|0, my=py|0;
@@ -473,105 +628,191 @@ function render3D(){
     let sx,sy,sdx,sdy;
     if(rdx<0){sx=-1;sdx=(px-mx)*ddx}else{sx=1;sdx=(mx+1-px)*ddx}
     if(rdy<0){sy=-1;sdy=(py-my)*ddy}else{sy=1;sdy=(my+1-py)*ddy}
-    let clipY=RH, dIn=0, curIdx=my*N+mx, cur=cells[curIdx], side=0, wallTop=hor, dOut=0;
-    zbuf[x]=MAXD;
-    for(let it=0;it<200;it++){
+    let clipB=RH, yb=-1, side=0, dOut=0;
+    zbuf[x]=FAR;
+    for(let it=0;it<260;it++){
       if(sdx<sdy){dOut=sdx;sdx+=ddx;mx+=sx;side=0}else{dOut=sdy;sdy+=ddy;my+=sy;side=1}
       if(dOut<1e-4)dOut=1e-4;
-      if(cur!==PIT){                                      // floor of this cell
-        const yF=Math.ceil(hor+eyeS/dOut);
-        let y1=dIn>0?Math.ceil(hor+eyeS/dIn):RH; if(y1>clipY)y1=clipY;
-        const y0=yF<0?0:yF;
-        if(y0<y1){
-          const g=glow[curIdx], cave=cur===CAVE;
-          for(let y=y0;y<y1;y++){
-            const d=eyeS/(y+.5-hor), wx=px+rdx*d, wy=py+rdy*d;
-            const ti=(((wy*TS)&63)<<6)|((wx*TS)&63);
-            const br=1/(1+d*d*fk);
-            let r=fR[ti]*(br+g*.12), gg=fG[ti]*(br+g*.75), b=fB[ti]*(br+g*.6);
-            if(cave){r*=.7;gg*=1.25;b*=1.1}
-            buf[y*RW+x]=0xff000000|((b>255?255:b)<<16)|((gg>255?255:gg)<<8)|(r>255?255:r);
-          }
+      if(mx<0||my<0||mx>=N||my>=N||dOut>FAR)break;
+      const ni=my*N+mx, c=cells[ni];
+      if(c!==ROCK&&c!==PIT)continue;
+      const hsh=hash(ni*2654435+17);
+      const h=c===PIT?hgt[ni]:(hsh>.9?2.3:1.02+hsh*.3);    // buildings by storeys; hedges with the odd tree
+      const top=Math.floor(hor-(h-EYE)*s/dOut)+1;
+      if(yb<0){ yb=Math.ceil(hor+eyeS/dOut); zbuf[x]=dOut; if(yb<clipB)clipB=yb; }
+      if(top>=clipB)continue;
+      const wh=side===0?py+dOut*rdy:px+dOut*rdx, u=wh-Math.floor(wh), tx=(u*TS)&63, inv=dOut/s;
+      const hz=Math.min(.8,(dOut/FAR)*(dOut/FAR)*1.4), lamp=lampK/(1+dOut*dOut*fk), sh=side?.8:1;
+      const kr=(LR*sh+lamp)*(1-hz), kg=(LG*sh+lamp)*(1-hz), kb=(LB*sh+lamp)*(1-hz), hr=Hh[0]*hz, hg=Hh[1]*hz, hb=Hh[2]*hz;
+      if(c===PIT){
+        const col=BRICK[(hash(bid[ni]*7919+3)*BRICK.length)|0], seed=bid[ni]*131+((side?mx:my)&255)*7;
+        for(let y=top<0?0:top;y<clipB;y++){
+          const hh=EYE-(y+.5-hor)*inv, cu=(u*2)|0, row=(hh*1.05)|0, fu=u*2-cu, fv=hh*1.05-row;
+          let r,g,b;
+          if(fu>.24&&fu<.76&&fv>.3&&fv<.78&&hh<h-.25){
+            if(night&&hash(seed*31+cu*7919+row*104729+(wh|0)*613)>.55){r=255*(1-hz*.5);g=186*(1-hz*.5);b=96*(1-hz*.5)}
+            else{r=(Z[0]*.45+18)*kr+hr;g=(Z[1]*.45+22)*kg+hg;b=(Z[2]*.45+30)*kb+hb}
+          }else{
+            const m=(hh>h-.14||fv<.05)?.78:1, tn=.82+rR[((((hh*TS)&63))<<6)|tx]*.0016;
+            r=col[0]*m*tn*kr+hr;g=col[1]*m*tn*kg+hg;b=col[2]*m*tn*kb+hb}
+          buf[y*RW+x]=0xff000000|((b>255?255:b)<<16)|((g>255?255:g)<<8)|(r>255?255:r);
         }
-        if(yF<clipY)clipY=yF;
+      }else{
+        const tree=hsh>.9;
+        for(let y=top<0?0:top;y<clipB;y++){
+          const hh=EYE-(y+.5-hor)*inv, t=rG[((((hh*TS)&63))<<6)|tx];
+          let r=t*(tree?.3:.36)*kr+hr, g=t*(tree?.62:.78)*kg+hg, b=t*.3*kb+hb;
+          if(tree&&hh<.9&&u>.4&&u<.6){r=70*kr+hr;g=50*kg+hg;b=34*kb+hb}
+          buf[y*RW+x]=0xff000000|((b>255?255:b)<<16)|((g>255?255:g)<<8)|(r>255?255:r);
+        }
+      }
+      clipB=top<0?0:top; if(clipB<=0)break;
+    }
+    skyRows(x,0,clipB,hor,s,night?(Math.atan2(rdy,rdx)*70)|0:0);
+    for(let y=yb<0?hor+1:yb;y<RH;y++){                    // ground: asphalt where cars drive, paving elsewhere
+      const d=eyeS/(y+.5-hor);
+      if(d>FAR){buf[y*RW+x]=0xff000000|(Hh[2]<<16)|(Hh[1]<<8)|Hh[0];continue}
+      const wx=px+rdx*d, wy=py+rdy*d, ti=(((wy*TS)&63)<<6)|((wx*TS)&63), ci=(wy|0)*N+(wx|0), c=cells[ci];
+      const hz=Math.min(.8,(d/FAR)*(d/FAR)*1.4), lamp=lampK/(1+d*d*fk), lum=fG[ti];
+      let r,g,b;
+      if(rw[ci]>=2){r=lum*.42;g=lum*.44;b=lum*.5}
+      else if(c===PADDN){r=lum*.5;g=lum*1.5;b=lum*.9}
+      else if(c===PADUP){r=lum*.6;g=lum*.5;b=lum*.7}
+      else{r=fR[ti]*1.05;g=fG[ti]*1.22;b=fB[ti]*1.45}
+      r=r*(LR+lamp)*(1-hz)+Hh[0]*hz; g=g*(LG+lamp)*(1-hz)+Hh[1]*hz; b=b*(LB+lamp)*(1-hz)+Hh[2]*hz;
+      buf[y*RW+x]=0xff000000|((b>255?255:b)<<16)|((g>255?255:g)<<8)|(r>255?255:r);
+    }
+  }
+  blitAndSprites(hor,s,dirX,dirY,plX,plY);
+}
+function render3D(){ if(realm===1)return renderTop();
+  const cells=W.cells, glow=W.glow, glow2=W.glow2, skyL=W.skyL, buf=buf32;
+  buf.fill(0xff050304);
+  const px=P.x, py=P.y, dirX=Math.cos(P.a), dirY=Math.sin(P.a), plX=-dirY*PLANE, plY=dirX*PLANE;
+  const s=RW/(2*PLANE), bob=Math.sin(P.bobT*Math.PI*2)*RH*.006;
+  const hor=Math.round(RH/2+P.tilt+bob), eyeS=EYE*s, ceilS=(CEIL-EYE)*s, topS=(CEIL+SH-EYE)*s, fk=fogK*fogK;
+  const rR=texRock.R,rG=texRock.G,rB=texRock.B,fR=texFloor.R,fG=texFloor.G,fB=texFloor.B;
+  const Z=SKY.zen,Hh=SKY.hor,LR=SKY.lit[0],LG=SKY.lit[1],LB=SKY.lit[2],stars=SKY.stars;
+  for(let x=0;x<RW;x++){
+    const camX=2*(x+.5)/RW-1, rdx=dirX+plX*camX, rdy=dirY+plY*camX;
+    let mx=px|0, my=py|0;
+    const ddx=rdx===0?1e30:Math.abs(1/rdx), ddy=rdy===0?1e30:Math.abs(1/rdy);
+    let sx,sy,sdx,sdy;
+    if(rdx<0){sx=-1;sdx=(px-mx)*ddx}else{sx=1;sdx=(mx+1-px)*ddx}
+    if(rdy<0){sy=-1;sdy=(py-my)*ddy}else{sy=1;sdy=(my+1-py)*ddy}
+    let clipT=0, dIn=0, curIdx=my*N+mx, cur=cells[curIdx], side=0, yb=hor+1, dOut=0;
+    const az=stars?(Math.atan2(rdy,rdx)*70)|0:0;
+    zbuf[x]=MAXD;
+    // sky rows [a,b) of this column
+    const sky=(a,b)=>skyRows(x,a,b,hor,s,az);
+    for(let it=0;it<220;it++){
+      if(sdx<sdy){dOut=sdx;sdx+=ddx;mx+=sx;side=0}else{dOut=sdy;sdy+=ddy;my+=sy;side=1}
+      if(dOut<1e-4)dOut=1e-4;
+      const rC=Math.floor(hor-ceilS/dOut)+1;              // first row below the ceiling line at this distance
+      if(cur!==PIT){                                      // ceiling of this cell
+        let y0=dIn>0?Math.floor(hor-ceilS/dIn)+1:0; if(y0<clipT)y0=clipT;
+        const y1=rC>RH?RH:rC;
+        for(let y=y0;y<y1;y++){
+          const d=ceilS/(hor-y-.5), wx=px+rdx*d, wy=py+rdy*d, ti=(((wy*TS)&63)<<6)|((wx*TS)&63);
+          const ci=(wy|0)*N+(wx|0), g=glow[ci]||0, sl=(skyL[ci]||0)*.5/(1+d*.04), br=.62/(1+d*d*fk);
+          const r=rR[ti]*(br+g*.08+sl*LR), gg=rG[ti]*(br+g*.5+sl*LG), b=rB[ti]*(br+g*.4+sl*LB);
+          buf[y*RW+x]=0xff000000|((b>255?255:b)<<16)|((gg>255?255:gg)<<8)|(r>255?255:r);
+        }
+        if(rC>clipT)clipT=rC;
       }
       const ni=my*N+mx, nxt=cells[ni];
-      if(nxt===ROCK){                                     // solid wall ends the ray
-        const top=Math.ceil(hor-ceilS/dOut);
-        let y1=Math.ceil(hor+(cur===PIT?EYE+DEPTH:EYE)*s/dOut); if(y1>clipY)y1=clipY;
-        const wh=side===0?py+dOut*rdy:px+dOut*rdx, u=wh-Math.floor(wh), tx=(u*TS)&63;
-        const br=1/(1+dOut*dOut*fk)*(side?.76:1), g=glow[curIdx], inv=dOut/s;
-        const kr=br+g*.12, kg=br+g*.75, kb=br+g*.6;
-        for(let y=top<0?0:top;y<y1;y++){
-          const h=EYE-(y+.5-hor)*inv;
-          if(h>=0){
-            const ti=((((CEIL-h)*TS)&63)<<6)|tx;
-            const r=rR[ti]*kr, gg=rG[ti]*kg, b=rB[ti]*kb;
-            buf[y*RW+x]=0xff000000|((b>255?255:b)<<16)|((gg>255?255:gg)<<8)|(r>255?255:r);
-          }else buf[y*RW+x]=pitPix(u,-h,dOut,ni,side,fk);
+      if(nxt===ROCK||(cur===PIT&&nxt!==PIT)){
+        const wh=side===0?py+dOut*rdy:px+dOut*rdx, u=wh-Math.floor(wh), tx=(u*TS)&63, inv=dOut/s;
+        let top=rC;
+        if(cur===PIT){ top=Math.floor(hor-topS/dOut)+1; sky(clipT,top); if(top<clipT)top=clipT; }
+        else if(top<clipT)top=clipT;
+        if(nxt===ROCK){                                   // solid wall ends the ray
+          yb=Math.ceil(hor+eyeS/dOut); const y1=yb>RH?RH:yb;
+          const g=glow[curIdx], sl=skyL[curIdx]*(dOut>=MAXD?0:1-dOut/MAXD)/(1+dOut*.03)*(side?.8:1);
+          const br=1/(1+dOut*dOut*fk)*(side?.76:1);
+          const kr=br+g*.12+sl*LR*.9, kg=br+g*.75+sl*LG*.9, kb=br+g*.6+sl*LB*.9;
+          for(let y=top<0?0:top;y<y1;y++){
+            const h=EYE-(y+.5-hor)*inv;
+            if(h<=CEIL){
+              const ti=((((CEIL-h)*TS)&63)<<6)|tx;
+              const r=rR[ti]*kr, gg=rG[ti]*kg, b=rB[ti]*kb;
+              buf[y*RW+x]=0xff000000|((b>255?255:b)<<16)|((gg>255?255:gg)<<8)|(r>255?255:r);
+            }else buf[y*RW+x]=shaftPix(u,h-CEIL,dOut,ni,side);
+          }
+          zbuf[x]=dOut; break;
         }
-        zbuf[x]=dOut; wallTop=top; break;
-      }
-      if(cur===PIT&&nxt!==PIT){                           // far lip of a pit, below floor level
-        const top=Math.ceil(hor+eyeS/dOut);
-        let y1=Math.ceil(hor+(EYE+DEPTH)*s/dOut); if(y1>clipY)y1=clipY;
-        const wh=side===0?py+dOut*rdy:px+dOut*rdx, u=wh-Math.floor(wh), inv=dOut/s;
-        for(let y=top<0?0:top;y<y1;y++)buf[y*RW+x]=pitPix(u,(y+.5-hor)*inv-EYE,dOut,ni,side,fk);
-        if(top<clipY)clipY=top;
+        const y1=rC>RH?RH:rC;                             // far lip of a shaft, above the next tunnel's ceiling
+        for(let y=top<0?0:top;y<y1;y++)buf[y*RW+x]=shaftPix(u,EYE-(y+.5-hor)*inv-CEIL,dOut,ni,side);
+        if(rC>clipT)clipT=rC;
       }
       cur=nxt; curIdx=ni; dIn=dOut;
-      if(dOut>MAXD){wallTop=hor;break}
+      if(dOut>MAXD){ if(cur===PIT)sky(clipT,Math.floor(hor-topS/dOut)+1); break }
     }
-    let yc=wallTop<hor?wallTop:hor; if(yc>RH)yc=RH;       // ceiling
-    for(let y=0;y<yc;y++){
-      const d=ceilS/(hor-y-.5); if(d>MAXD)continue;
+    for(let y=yb<0?0:yb;y<RH;y++){                        // floor, lit by lamp, food glow and sky
+      const d=eyeS/(y+.5-hor); if(d>MAXD)continue;
       const wx=px+rdx*d, wy=py+rdy*d, ti=(((wy*TS)&63)<<6)|((wx*TS)&63);
-      const g=glow[(wy|0)*N+(wx|0)]||0, br=.62/(1+d*d*fk);
-      const r=rR[ti]*(br+g*.08), gg=rG[ti]*(br+g*.5), b=rB[ti]*(br+g*.4);
+      const ci=(wy|0)*N+(wx|0), g=glow[ci]||0, sl=(skyL[ci]||0)*(1-d/MAXD)/(1+d*.03), br=1/(1+d*d*fk);
+      let r=fR[ti]*(br+g*.12+sl*LR*1.7), gg=fG[ti]*(br+g*.75+sl*LG*1.7), b=fB[ti]*(br+g*.6+sl*LB*1.7);
+      const g2=glow2[ci]; if(g2>0){r+=fR[ti]*g2*.95;gg+=fG[ti]*g2*.25;b+=fB[ti]*g2*1.1}
+      if(cells[ci]===CAVE){r*=.7;gg*=1.25;b*=1.1}
       buf[y*RW+x]=0xff000000|((b>255?255:b)<<16)|((gg>255?255:gg)<<8)|(r>255?255:r);
     }
   }
+  blitAndSprites(hor,s,dirX,dirY,plX,plY);
+}
+const EMO='"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif';
+function blitAndSprites(hor,s,dirX,dirY,plX,plY){
   octx.putImageData(img,0,0);
   vctx.imageSmoothingEnabled=false;
   vctx.drawImage(off,0,0,CW,CH);
-  // food sprites
-  const k=CW/RW, invDet=1/(plX*dirY-dirX*plY), t=performance.now()/1000;
+  const px=P.x, py=P.y, k=CW/RW, invDet=1/(plX*dirY-dirX*plY), t=performance.now()/1000, top=realm===1;
   const list=[];
-  for(const c of W.caves){
-    const dx=c.x+.5-px, dy=c.y+.5-py; if(dx*dx+dy*dy>900)continue;
-    const tx=invDet*(dirY*dx-dirX*dy), tz=invDet*(-plY*dx+plX*dy);
-    if(tz<.25)continue;
-    const scx=(RW/2)*(1+tx/tz), col=scx|0;
-    if(col<0||col>=RW||zbuf[col]<tz-.45)continue;
-    list.push([tz,scx,c]);
-  }
+  // [wx,wy,glyph,size,centreHeight,alpha,glowRGB,colour,flip]
+  const add=(wx,wy,gl,size,ch,al,glowc,colr,flip)=>{
+    const dx=wx-px, dy=wy-py; if(dx*dx+dy*dy>(top?2500:900))return;
+    const tx=invDet*(dirY*dx-dirX*dy), tz=invDet*(-plY*dx+plX*dy); if(tz<.25)return;
+    const scx=(RW/2)*(1+tx/tz), col=scx|0; if(col<0||col>=RW||zbuf[col]<tz-.45)return;
+    list.push([tz,scx,gl,size,ch,al,glowc,colr,flip]);
+  };
+  for(const c of W.caves)add(c.x+.5,c.y+.5,c.emoji,.34,.4,c.found?.55:1,top?null:'93,240,192',null,false);
+  if(top){
+    for(const d of W.downs)add(d.x+.5,d.y+.5,'▼',.36,.42,1,'110,255,170','#8dffb8',false);
+    for(const c of cars)add(c.x,c.y,c.emoji,.7,.3,1,SKY.stars?'255,240,190':null,null,(c.vx*plX+c.vy*plY)>0);
+  }else for(const u of W.ups)add(u.x+.5,u.y+.5,'▲',.36,.42,1,'255,110,220','#ff9be6',false);
   list.sort((a,b)=>b[0]-a[0]);
   vctx.textAlign='center'; vctx.textBaseline='middle';
-  for(const [tz,scx,c] of list){
-    const size=s/tz*.34*k, X=scx*k, Y=(hor+(EYE-.4)*s/tz)*(CH/RH)+Math.sin(t*2+c.idx)*size*.06;
-    const al=clamp(1.5/(1+tz*tz*fogK*fogK*.5),0,1);
-    vctx.globalAlpha=al*(c.found?.55:1);
-    const gr=vctx.createRadialGradient(X,Y,0,X,Y,size*1.5);
-    gr.addColorStop(0,'rgba(93,240,192,.55)'); gr.addColorStop(1,'rgba(93,240,192,0)');
-    vctx.fillStyle=gr; vctx.fillRect(X-size*1.5,Y-size*1.5,size*3,size*3);
-    vctx.globalAlpha=al; vctx.fillStyle='#fff';
-    vctx.font=`${Math.max(6,size)|0}px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif`;
-    vctx.fillText(c.emoji,X,Y);
+  for(const [tz,scx,gl,sz,ch,am,glowc,colr,flip] of list){
+    const size=s/tz*sz*k, X=scx*k, Y=(hor+(EYE-ch)*s/tz)*(CH/RH)+(ch>.35?Math.sin(t*2+scx*.01)*size*.06:0);
+    const al=top?clamp(1.7-tz/28,0,1):clamp(1.5/(1+tz*tz*fogK*fogK*.5),0,1);
+    if(glowc){
+      vctx.globalAlpha=al*am;
+      const gr=vctx.createRadialGradient(X,Y,0,X,Y,size*1.5);
+      gr.addColorStop(0,`rgba(${glowc},.55)`); gr.addColorStop(1,`rgba(${glowc},0)`);
+      vctx.fillStyle=gr; vctx.fillRect(X-size*1.5,Y-size*1.5,size*3,size*3);
+    }
+    vctx.globalAlpha=al; vctx.fillStyle=colr||'#fff';
+    vctx.font=colr?`700 ${Math.max(6,size)|0}px sans-serif`:`${Math.max(6,size)|0}px ${EMO}`;
+    if(flip){vctx.save();vctx.translate(X,Y);vctx.scale(-1,1);vctx.fillText(gl,0,0);vctx.restore()}
+    else vctx.fillText(gl,X,Y);
   }
   vctx.globalAlpha=1;
+  if(top&&grace>0){vctx.fillStyle=`rgba(255,255,255,${Math.min(.85,grace*.5)})`;vctx.fillRect(0,0,CW,CH)}
+  else if(!top&&grace>0){vctx.fillStyle=`rgba(20,10,30,${Math.min(.85,grace*.5)})`;vctx.fillRect(0,0,CW,CH)}
 }
 
 /* ---------- maps ---------- */
-const MAPCOL={[TUN]:0xff82bee2,[PIT]:0xff2a3446,[CAVE]:0xffc0f05d};   // ABGR
+const MAPCOL={[TUN]:0xff5f95c4,[PIT]:0xffd9b47a,[CAVE]:0xffc0f05d,[PADUP]:0xffe66eff,[PADDN]:0xff5f95c4};   // ABGR
 function reveal(){
   const cx=P.x|0, cy=P.y|0, R=5, w=W;
   for(let dy=-R;dy<=R;dy++)for(let dx=-R;dx<=R;dx++){
     if(dx*dx+dy*dy>R*R+2)continue;
     const x=cx+dx,y=cy+dy; if(x<0||y<0||x>=N||y>=N)continue;
-    const k=y*N+x, c=w.cells[k]; if(c===ROCK||w.seen[k])continue;
-    w.seen[k]=1; map32[k]=MAPCOL[c]; mapDirty=true; if(w.reach[k])w.seenCount++;
+    const k=y*N+x, c=w.cells[k]; if(c===ROCK)continue;
+    if(!w.seen[k]){w.seen[k]=1; map32[k]=MAPCOL[c]; mapDirty=true; if(w.reach[k])w.seenCount++}
+    if(c===PADDN&&realm===1&&w.seen[k]!==2){w.seen[k]=2; map32[k]=PADDN_COL; mapDirty=true}
   }
 }
+const PADDN_COL=0xffaaff78;
 function flushMap(){ if(mapDirty){mapCtx.putImageData(mapImg,0,0);mapDirty=false} }
 const mini=$('mini'), mctx=mini.getContext('2d');
 function arrowPath(ctx,x,y,a,sz){
@@ -609,27 +850,37 @@ function tone(f,dur,vol,type,when){
 function wakeAudio(){ try{AC=AC||new (window.AudioContext||window.webkitAudioContext)(); if(AC.state==='suspended')AC.resume()}catch(e){} }
 
 /* ---------- HUD ---------- */
-let toastT=0;
+let toastT=0,lastNote='';
 function toast(msg,ms){const el=$('toast');el.textContent=msg;el.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>el.classList.remove('on'),ms||3200)}
 let lastCell=-1,lastHud=0;
 function updateHud(now){
   const k=(P.y|0)*N+(P.x|0);
   if(k!==lastCell){lastCell=k;reveal();$('street').textContent=W.names[W.nameIdx[k]]||'the rock'}
+  $('lbl').textContent=realm===1?'TOPSIDE · ON':'BENEATH';
   if(now-lastHud<200)return; lastHud=now;
   const e=Math.round(energy*100);
   $('fedPct').textContent=e+'%'; const bar=$('bar').firstElementChild; bar.style.width=e+'%'; bar.style.background=energy<.25?'#ff6a4d':'';
   $('stats').innerHTML=`<b>${W.found}/${W.caves.length}</b> caves · ${pct()}% mapped`;
   let best=null,bd=1e9; const all=W.found>=W.caves.length;
-  for(const c of W.caves){ if(c.found&&!all)continue; const d=Math.hypot(c.x+.5-P.x,c.y+.5-P.y); if(d<bd){bd=d;best=c} }
-  if(best){
+  if(realm===1){ for(const c of W.downs){const d=Math.hypot(c.x+.5-P.x,c.y+.5-P.y); if(d<bd){bd=d;best=c}} }
+  else for(const c of W.caves){ if(c.found&&!all)continue; const d=Math.hypot(c.x+.5-P.x,c.y+.5-P.y); if(d<bd){bd=d;best=c} }
+  // nearest car that is heading your way
+  let dc=null,dd=10;
+  if(realm===1)for(const c of cars){const ox=P.x-c.x,oy=P.y-c.y,d=Math.hypot(ox,oy); if(d<dd&&ox*c.vx+oy*c.vy>0){dd=d;dc=c}}
+  const dg=$('danger'); dg.style.opacity=dc?'1':'0';
+  if(dc){$('dArrow').style.transform=`rotate(${Math.atan2(dc.y-P.y,dc.x-P.x)-P.a}rad)`; if(dd<6)tone(86,.16,.05,'sawtooth')}
+  if(best&&realm===1){
+    $('arrow').style.transform=`rotate(${Math.atan2(best.y+.5-P.y,best.x+.5-P.x)-P.a}rad)`;
+    $('scentTxt').textContent=`Way down ▼ · ${Math.round(bd*W.cellM/5)*5} m`;
+  }else if(best){
     const rel=Math.atan2(best.y+.5-P.y,best.x+.5-P.x)-P.a;
     $('arrow').style.transform=`rotate(${rel+Math.PI/2-Math.PI/2}rad)`;
-    $('scentTxt').textContent=`${all?best.emoji:'Something tasty'} · ${Math.round(bd*CELL_M/5)*5} m`;
+    $('scentTxt').textContent=`${all?best.emoji:'Something tasty'} · ${Math.round(bd*W.cellM/5)*5} m`;
   }
 }
 
 /* ---------- movement ---------- */
-const walkable=c=>c===TUN||c===CAVE;
+const walkable=c=>c!==ROCK&&(realm===0||c!==PIT);
 function free(x,y){const r=.3,c=W.cells;
   return walkable(c[((y-r)|0)*N+((x-r)|0)])&&walkable(c[((y-r)|0)*N+((x+r)|0)])&&walkable(c[((y+r)|0)*N+((x-r)|0)])&&walkable(c[((y+r)|0)*N+((x+r)|0)])}
 function advance(dist){
@@ -641,7 +892,106 @@ function advance(dist){
   }
   return moved;
 }
-const keys={}; let pendingWalk=0;
+const keys={}; let pendingWalk=0,lastMoveT=0,skyTold=false;
+const CAR_EMO=['🚗','🚙','🚕','🚗','🚙','🚐','🚚','🚌','🏍️'];
+function carPos(c){
+  const rd=c.rd; let i=c.seg; while(i>0&&rd.cum[i]>c.t)i--; while(i<rd.cum.length-2&&rd.cum[i+1]<c.t)i++; c.seg=i;
+  const a=rd.pts[i], b=rd.pts[i+1], L=rd.cum[i+1]-rd.cum[i]||1, f=(c.t-rd.cum[i])/L;
+  const ux=(b[0]-a[0])/L*c.dir, uy=(b[1]-a[1])/L*c.dir, off=rd.w*.25, sgn=W.driveLeft?1:-1;
+  c.vx=ux*c.sp; c.vy=uy*c.sp;
+  c.x=a[0]+(b[0]-a[0])*f+uy*off*sgn; c.y=a[1]+(b[1]-a[1])*f-ux*off*sgn;
+}
+function spawnCar(c){
+  for(let t=0;t<80;t++){
+    const rd=W.drive[(Math.random()*W.drive.length)|0];
+    c.rd=rd; c.t=Math.random()*rd.len; c.seg=0; c.dir=Math.random()<.5?1:-1; c.sp=3.2+Math.random()*2.6;
+    c.emoji=CAR_EMO[(Math.random()*CAR_EMO.length)|0]; carPos(c);
+    const d=Math.hypot(c.x-P.x,c.y-P.y);
+    if(d>13&&d<42&&c.x>2&&c.y>2&&c.x<N-2&&c.y<N-2&&W.cells[(c.y|0)*N+(c.x|0)]!==ROCK)return true;
+  }
+  c.x=-99;c.y=-99;c.vx=c.vy=0; return false;
+}
+function updateCars(dt){
+  if(!W.drive.length)return;
+  while(cars.length<24){const c={};spawnCar(c);cars.push(c)}
+  for(const c of cars){
+    if(c.x<-50){ if(Math.random()<dt)spawnCar(c); continue }
+    c.t+=c.sp*c.dir*dt;
+    if(c.t<=0||c.t>=c.rd.len){spawnCar(c);continue}
+    carPos(c);
+    const d=Math.hypot(c.x-P.x,c.y-P.y);
+    if(d>52||c.x<2||c.y<2||c.x>N-2||c.y>N-2){spawnCar(c);continue}
+    if(d<.62&&grace<=0){gameOver();return}
+  }
+}
+function teleport(to){
+  realm=to; grace=1.6; P.v=0; pendingWalk=0; P.tilt=0; lastCell=-1; cars.length=0;
+  if(to===1){surfaced++; toast('Topside. Cars will not stop for you. Find a ▼ pad to get back down.',5200);[196,294,440].forEach((f,i)=>tone(f,.3,.07,'triangle',i*.08))}
+  else{escapes++; toast('Back in the understreet. Safe.',3200);[440,294,196].forEach((f,i)=>tone(f,.3,.07,'triangle',i*.08))}
+}
+function gameOver(){
+  running=false; flattened++; tone(60,.6,.15,'sawtooth'); tone(45,.8,.15,'square',.05);
+  hospital(W.names[W.nameIdx[(P.y|0)*N+(P.x|0)]]||'the road');
+}
+/* ---------- hospital: you heal by solving a sudoku ---------- */
+const SUD={sol:null,given:null,val:null,sel:-1,done:false};
+function sudokuNew(givens){
+  const sh=a=>{for(let i=a.length-1;i>0;i--){const j=(Math.random()*(i+1))|0;[a[i],a[j]]=[a[j],a[i]]}return a};
+  const lines=()=>{const o=[];for(const b of sh([0,1,2]))for(const r of sh([0,1,2]))o.push(b*3+r);return o};
+  const rows=lines(), cols=lines(), nums=sh([1,2,3,4,5,6,7,8,9]), sol=new Uint8Array(81);
+  for(let r=0;r<9;r++)for(let c=0;c<9;c++){const R=rows[r],C=cols[c];sol[r*9+c]=nums[(3*(R%3)+((R/3)|0)+C)%9]}
+  const puz=sol.slice(); let left=81;
+  for(const i of sh([...Array(81).keys()])){ if(left<=givens)break; const keep=puz[i]; puz[i]=0; if(sudokuCount(puz,2)===1)left--; else puz[i]=keep }
+  return {sol,puz};
+}
+function sudokuCount(g,limit){                     // number of solutions, stopping at limit
+  const row=new Uint16Array(9),col=new Uint16Array(9),box=new Uint16Array(9),a=g.slice();
+  for(let i=0;i<81;i++)if(a[i]){const b=1<<a[i];row[(i/9)|0]|=b;col[i%9]|=b;box[(((i/27)|0)*3)+(((i%9)/3)|0)]|=b}
+  let count=0;
+  (function go(){
+    let bi=-1,bm=0,bn=10;
+    for(let i=0;i<81;i++)if(!a[i]){const m=~(row[(i/9)|0]|col[i%9]|box[(((i/27)|0)*3)+(((i%9)/3)|0)])&1022; let n=0;for(let v=m;v;v&=v-1)n++; if(n<bn){bn=n;bi=i;bm=m;if(n<2)break}}
+    if(bi<0){count++;return}
+    const r=(bi/9)|0,c=bi%9,b=(((bi/27)|0)*3)+((c/3)|0);
+    for(let d=1;d<=9&&count<limit;d++)if(bm&(1<<d)){a[bi]=d;row[r]|=1<<d;col[c]|=1<<d;box[b]|=1<<d;go();a[bi]=0;row[r]&=~(1<<d);col[c]&=~(1<<d);box[b]&=~(1<<d)}
+  })();
+  return count;
+}
+function sudokuDraw(){
+  const bad=new Uint8Array(81), v=SUD.val;
+  for(let i=0;i<81;i++){ if(!v[i])continue; const r=(i/9)|0,c=i%9;
+    for(let j=i+1;j<81;j++){ if(v[j]!==v[i])continue; const r2=(j/9)|0,c2=j%9;
+      if(r===r2||c===c2||(((r/3)|0)===((r2/3)|0)&&((c/3)|0)===((c2/3)|0))){bad[i]=bad[j]=1} } }
+  const cellsEl=$('sudoku').children; let full=true, clean=true;
+  for(let i=0;i<81;i++){ const el=cellsEl[i]; el.textContent=v[i]||'';
+    el.className='sc'+(SUD.given[i]?' giv':'')+(i===SUD.sel?' sel':'')+(bad[i]?' bad':'')+(SUD.sel>=0&&v[i]&&v[i]===v[SUD.sel]&&i!==SUD.sel?' same':'');
+    if(!v[i])full=false; if(bad[i])clean=false; }
+  let left=0; for(let i=0;i<81;i++)if(!v[i])left++;
+  $('sudLeft').textContent=left?left+' to go':'';
+  if(full&&clean&&!SUD.done){SUD.done=true;discharge()}
+}
+function sudokuPut(d){ if(SUD.done||SUD.sel<0||SUD.given[SUD.sel])return; SUD.val[SUD.sel]=d; tone(d?520:300,.06,.04); sudokuDraw() }
+function hospScene(emoji,title,text){ $('hospEmoji').textContent=emoji; $('hospTitle').textContent=title; $('hospText').textContent=text }
+const wait=ms=>new Promise(r=>setTimeout(r,ms));
+async function hospital(street){
+  show('hosp',true); $('hospPlay').style.display='none';
+  hospScene('🚁🤖','Flattened',`A robot helicopter ambulance scrapes you off ${street}.`);
+  const {sol,puz}=sudokuNew(44);
+  SUD.sol=sol; SUD.given=puz.map(v=>v?1:0); SUD.val=puz.slice(); SUD.sel=-1; SUD.done=false;
+  await wait(2800);
+  hospScene('🛏️','St Sudoku\'s','Doctor: "You will heal. Nothing to do here but this. Solve it and you can go."');
+  $('hospPlay').style.display='block'; sudokuDraw();
+}
+async function discharge(){
+  [523,659,784,1047].forEach((f,i)=>tone(f,.25,.07,'sine',i*.09));
+  hospScene('🩺','Cured','Doctor: "Fine. You are fixed. Out."');
+  await wait(2200); $('hospPlay').style.display='none';
+  hospScene('🚁🤖','Kicked to the curb','The robot drops you exactly where it found you. The cars have not gone anywhere.');
+  await wait(2600);
+  show('hosp',false); cars.length=0; grace=3; P.v=0; pendingWalk=0; realm=1; running=true;
+  toast('Topside again. Move.',3000);
+}
+
 function update(dt){
   let turn=0,fwd=0;
   if(keys.ArrowLeft||keys.a)turn-=1; if(keys.ArrowRight||keys.d)turn+=1;
@@ -662,13 +1012,21 @@ function update(dt){
       if($('hint').style.opacity!=='0'&&walked>2)$('hint').style.opacity='0';
     }
   }
-  // look down when a pit is near ahead
-  const cx=Math.cos(P.a),cy=Math.sin(P.a); let near=0;
-  for(let d=.7;d<=3.2;d+=.5){const c=W.cells[((P.y+cy*d)|0)*N+((P.x+cx*d)|0)]; if(c===PIT){near=1-d/4;break} if(c===ROCK)break}
-  P.tilt+=(-near*RH*.2-P.tilt)*Math.min(1,dt*3.5);
+  if(grace>0)grace-=dt;
+  const pc=W.cells[(P.y|0)*N+(P.x|0)];
+  if(realm===0&&pc===PADUP){teleport(1);return}
+  if(realm===1&&pc===PADDN){teleport(0);return}
+  if(realm===1){updateCars(dt); if(!running)return; P.tilt+=(0-P.tilt)*Math.min(1,dt*4)}
+  // under a shaft: stand still and the view tips up to the sky
+  const cx=Math.cos(P.a),cy=Math.sin(P.a), here=realm===0&&pc===PIT;
+  if(want)lastMoveT=performance.now();
+  const still=performance.now()-lastMoveT>450; let tt=0;
+  if(here){tt=still?.43:.15; if(!skyTold){skyTold=true;toast('Open sky. Stand still to look up.',3600)}}
+  else if(realm===0)for(let d=.8;d<=3.3;d+=.5){const c=W.cells[((P.y+cy*d)|0)*N+((P.x+cx*d)|0)]; if(c===PIT){tt=.11*(1-d/4.5);break} if(c===ROCK)break}
+  P.tilt+=(tt*RH-P.tilt)*Math.min(1,dt*(tt*RH>P.tilt?2.2:4));
   // hunger dims the lamp
   const target=.32-.16*Math.sqrt(energy); fogK+=(target-fogK)*Math.min(1,dt*2);
-  if(energy<.25&&!lowWarned){lowWarned=true;toast('Hungry. Your lamp is fading — follow the scent.',4200)}
+  if(energy<.25&&!lowWarned&&realm===0){lowWarned=true;toast('Hungry. Your lamp is fading — follow the scent.',4200)}
   if(energy>.5)lowWarned=false;
   // food
   const cv=W.caveAt.get((P.y|0)*N+(P.x|0));
@@ -711,7 +1069,8 @@ function endPtr(e){
 }
 view.addEventListener('pointerup',endPtr); view.addEventListener('pointercancel',endPtr);
 view.addEventListener('contextmenu',e=>e.preventDefault());
-window.addEventListener('keydown',e=>{keys[e.key.length===1?e.key.toLowerCase():e.key]=true;
+window.addEventListener('keydown',e=>{ if($('hosp').classList.contains('on')){ if(/^[1-9]$/.test(e.key))sudokuPut(+e.key); else if(e.key==='Backspace'||e.key==='Delete'||e.key==='0')sudokuPut(0); return }
+  keys[e.key.length===1?e.key.toLowerCase():e.key]=true;
   if(running&&/^Arrow/.test(e.key))e.preventDefault(); if(e.key==='m'&&running)openMap(); if(e.key==='Escape'){if($('bigmap').classList.contains('on'))closeMap();else if(running)openMenu()}});
 window.addEventListener('keyup',e=>{keys[e.key.length===1?e.key.toLowerCase():e.key]=false});
 window.addEventListener('blur',()=>{for(const k in keys)keys[k]=false});
@@ -723,22 +1082,114 @@ function frame(now){
   const dt=Math.min(.05,(now-lastT)/1000||0); lastT=now;
   if(!W)return;
   if(running){update(dt);updateHud(now)}
+  if(G&&now-lastSaveT>8000){lastSaveT=now; if(running)saveProgress()}
+  if(G&&running)maybeShift(now);
   render3D(); drawMini();
 }
 
-/* ---------- screens ---------- */
-function show(id,on){$(id).classList.toggle('on',on)}
-function startWorld(src,msg){
-  const w=buildWorld(src); if(!w||w.total<60)return false;
-  W=w; P.x=w.start.x;P.y=w.start.y;P.a=w.start.a;P.v=0;P.tilt=0;pendingWalk=0;
-  energy=1;walked=0;lowWarned=false;doneWarned=false;lastCell=-1;fogK=.16;
-  map32.fill(0);mapDirty=true;
-  $('hint').style.opacity='1'; $('status').textContent='';
-  show('start',false);show('menu',false);show('bigmap',false); running=true;
-  toast(msg||(w.real?'You are under your own streets.':`Welcome to the underside of ${w.title}.`),3600);
-  return true;
+/* ---------- saving: IndexedDB, with an in-memory stand-in where it is unavailable ---------- */
+const DB={db:null,mem:{tiles:new Map(),prog:new Map()},ok:false,
+  async open(){ try{ this.db=await new Promise((ok,no)=>{ const r=indexedDB.open('understreet',1);
+        r.onupgradeneeded=()=>{const d=r.result; for(const n of ['tiles','prog'])if(!d.objectStoreNames.contains(n))d.createObjectStore(n,{keyPath:'key'})};
+        r.onsuccess=()=>ok(r.result); r.onerror=()=>no(r.error); r.onblocked=()=>no(new Error('blocked')); setTimeout(()=>no(new Error('timeout')),4000) });
+      this.ok=true }catch(e){ this.db=null; this.ok=false } },
+  req(store,mode,fn){ return new Promise((ok,no)=>{ try{ const tx=this.db.transaction(store,mode), r=fn(tx.objectStore(store)); r.onsuccess=()=>ok(r.result); r.onerror=()=>no(r.error) }catch(e){no(e)} }) },
+  async get(store,key){ if(this.db)try{return await this.req(store,'readonly',o=>o.get(key))}catch(e){} return this.mem[store].get(key) },
+  async put(store,val){ this.mem[store].set(val.key,val); if(this.db)try{await this.req(store,'readwrite',o=>o.put(val))}catch(e){} },
+  async all(store){ if(this.db)try{return await this.req(store,'readonly',o=>o.getAll())}catch(e){} return [...this.mem[store].values()] },
+};
+const tileCache=new Map(), progCache=new Map();     // loaded tile geometry and per-tile progress
+let G=null, shifting=false, shiftRetryAt=0, lastSaveT=0;   // G: the real-map window {z,cx,cy}; null in an invented city
+const newProg=(z,x,y)=>({key:tkey(z,x,y),z,x,y,label:'',visited:0,seen:new Uint8Array(T*T),found:[],caves:0,foundN:0,walk:0,seenN:0,pos:null});
+// Make sure the 3x3 tiles around (cx,cy) are on hand: memory, then the database, then one map request for whatever is missing.
+async function ensureTiles(z,cx,cy,onTry){
+  const missing=new Map();
+  for(let j=-1;j<=1;j++)for(let i=-1;i<=1;i++){
+    const x=cx+i,y=cy+j,key=tkey(z,x,y);
+    if(!tileCache.has(key)){ const t=await DB.get('tiles',key); if(t)tileCache.set(key,t); else missing.set(key,{key,z,x,y,roads:[],bld:[],pois:[],label:'',fetched:0}) }
+    if(!progCache.has(key))progCache.set(key,(await DB.get('prog',key))||newProg(z,x,y));
+  }
+  if(!missing.size)return;
+  let x0=1e9,x1=-1e9,y0=1e9,y1=-1e9; for(const t of missing.values()){x0=Math.min(x0,t.x);x1=Math.max(x1,t.x+1);y0=Math.min(y0,t.y);y1=Math.max(y1,t.y+1)}
+  const e=4/T, els=await fetchOSM({w:x2lon(x0-e,z),e:x2lon(x1+e,z),n:y2lat(y0-e,z),s:y2lat(y1+e,z)},onTry);
+  // a block of tiles may include ones we already hold; only the missing ones are filled
+  elsToTiles(els,z,missing);
+  for(const t of missing.values()){ t.fetched=Date.now(); tileCache.set(t.key,t); await DB.put('tiles',t) }
 }
+function applyProgress(w){
+  const g=w.grid; map32.fill(0); mapDirty=true; w.seenCount=0; w.found=0;
+  if(!g)return;
+  const foundIds=new Set();
+  for(let j=0;j<3;j++)for(let i=0;i<3;i++){
+    const pr=progCache.get(tkey(g.z,g.x0+i,g.y0+j)); if(!pr)continue;
+    for(const id of pr.found)foundIds.add(id);
+    for(let ly=0;ly<T;ly++)for(let lx=0;lx<T;lx++){ const v=pr.seen[ly*T+lx]; if(!v)continue;
+      const k=(j*T+ly)*N+i*T+lx, c=w.cells[k]; if(c===ROCK)continue;
+      w.seen[k]=v; map32[k]=(c===PADDN&&v===2)?PADDN_COL:MAPCOL[c]; if(w.reach[k])w.seenCount++ }
+  }
+  for(const c of w.caves)if(foundIds.has(c.id)){c.found=true;w.found++}
+}
+async function saveProgress(){
+  if(!W||!W.grid||!G)return; const g=W.grid, w=W, puts=[];
+  const ptx=Math.floor(P.x/T), pty=Math.floor(P.y/T);
+  for(let j=0;j<3;j++)for(let i=0;i<3;i++){
+    const key=tkey(g.z,g.x0+i,g.y0+j), pr=progCache.get(key)||newProg(g.z,g.x0+i,g.y0+j); let seenN=0, walk=0, any=false;
+    for(let ly=0;ly<T;ly++)for(let lx=0;lx<T;lx++){ const k=(j*T+ly)*N+i*T+lx; if(w.cells[k]!==ROCK)walk++; const v=w.seen[k]; if(v){seenN++; if(pr.seen[ly*T+lx]!==v){pr.seen[ly*T+lx]=v;any=true}} }
+    const mine=w.caves.filter(c=>c.tk===key), found=mine.filter(c=>c.found).map(c=>c.id);
+    const here=i===ptx&&j===pty;
+    if(!any&&!here&&found.length===pr.found.length&&pr.label)continue;
+    pr.seenN=seenN; pr.walk=walk; pr.caves=mine.length; pr.found=found; pr.foundN=found.length;
+    const t=tileCache.get(key); pr.label=(t&&t.label)||pr.label;
+    if(here){ pr.visited=Date.now(); pr.pos={x:P.x-i*T,y:P.y-j*T,a:P.a} }
+    progCache.set(key,pr); puts.push(DB.put('prog',pr));
+  }
+  await Promise.all(puts);
+}
+function show(id,on){$(id).classList.toggle('on',on)}
+function enterWorld(w,msg,keep){
+  W=w; applyProgress(w);
+  if(!keep){ P.x=w.start.x;P.y=w.start.y;P.a=w.start.a; realm=0; grace=0; surfaced=0; escapes=0; energy=1; walked=0; lowWarned=false; doneWarned=false; fogK=.16; $('hint').style.opacity='1' }
+  P.v=0;P.tilt=0;pendingWalk=0; cars.length=0; lastCell=-1;
+  $('status').textContent='';
+  show('start',false);show('menu',false);show('bigmap',false);show('hosp',false); running=true;
+  if(!keep){ lastNote=msg||''; toast(msg||(w.real?'You are under your own streets.':`Welcome to the underside of ${w.title}.`),msg?9000:3600) }
+}
+function startWorld(src,msg){ const w=buildWorld(src); if(!w||w.total<60)return false; G=null; enterWorld(w,msg); return true; }
 function invent(note){ let ok=false,tries=0; while(!ok&&tries++<5)ok=startWorld(inventCity((Math.random()*2**31)|0),note?note+' Here is an invented city instead.':null); }
+// Open the real-map window centred on tile (cx,cy). at = {X,Y,a?} in global tile units, or null for the tile centre.
+async function openPlace(z,cx,cy,at,onTry,resumed){
+  await ensureTiles(z,cx,cy,onTry);
+  const src=tilesToSrc(z,cx,cy,k=>tileCache.get(k));
+  src.startAt=at?{x:(at.X-(cx-1))*T,y:(at.Y-(cy-1))*T}:{x:N/2,y:N/2};
+  const w=buildWorld(src); if(!w||w.total<60)throw new Error(`only ${src.roads.length} streets here`);
+  G={z,cx,cy};
+  const before=progCache.get(tkey(z,cx,cy)), known=before&&before.visited;
+  enterWorld(w, resumed||known?`Welcome back to ${(tileCache.get(tkey(z,cx,cy))||{}).label||'your streets'}. Everything you found is still here.`:null);
+  if(at&&at.a!=null)P.a=at.a;
+  if(resumed||known)lastNote='';
+  saveProgress();
+}
+// Walked out of the middle tile: slide the window so the player is central again, loading new ground as needed.
+async function maybeShift(now){
+  if(!G||shifting||!W||!W.grid||now<shiftRetryAt)return;
+  const fx=P.x/T, fy=P.y/T, m=8/T;
+  const dx=fx<1-m?-1:fx>2+m?1:0, dy=fy<1-m?-1:fy>2+m?1:0;
+  const near=28/T, px=fx<1+near?-1:fx>2-near?1:0, py=fy<1+near?-1:fy>2-near?1:0;
+  if(!dx&&!dy){ if(px||py){ shifting=true; ensureTiles(G.z,G.cx+px,G.cy+py).catch(()=>{shiftRetryAt=performance.now()+20000}).finally(()=>{shifting=false}) } return; }
+  shifting=true;
+  try{
+    await saveProgress();
+    const nx=G.cx+dx, ny=G.cy+dy;
+    await ensureTiles(G.z,nx,ny);
+    const src=tilesToSrc(G.z,nx,ny,k=>tileCache.get(k));
+    src.startAt={x:P.x-dx*T,y:P.y-dy*T,exact:true};
+    const w=buildWorld(src); if(!w)throw new Error('nothing there');
+    P.x-=dx*T; P.y-=dy*T; G={z:G.z,cx:nx,cy:ny};
+    const wasRunning=running; enterWorld(w,null,true); running=wasRunning;
+    if(!$('hosp').classList.contains('on')&&!wasRunning){ /* a menu is open: stay paused */ }
+  }catch(e){ shiftRetryAt=performance.now()+20000; toast('Can\'t dig further right now ('+e.message+'). The edge of the map is solid until it loads.',5000) }
+  finally{ shifting=false }
+}
 async function useLocation(){
   const st=$('status'); $('btnLoc').disabled=$('btnInv').disabled=true;
   try{
@@ -746,20 +1197,49 @@ async function useLocation(){
     let pos; try{pos=await getPosition()}catch(e){invent(e&&e.code===1?'No location shared.':'Couldn\'t get a location.');return}
     const lat=Math.round(pos.coords.latitude*1000)/1000, lon=Math.round(pos.coords.longitude*1000)/1000;
     st.textContent='Digging under your streets…';
-    let els; try{els=await fetchOSM(lat,lon)}catch(e){invent('The map service didn\'t answer.');return}
-    if(!startWorld(osmToSrc(els,lat,lon)))invent('Not enough streets mapped around here.');
+    const z=zFor(lat), X=lon2x(lon,z), Y=lat2y(lat,z);
+    try{ await openPlace(z,Math.floor(X),Math.floor(Y),{X,Y},h=>{st.textContent='Digging under your streets… asking '+h}) }
+    catch(e){ invent('Couldn\'t dig here ('+e.message+').') }
   }finally{ $('btnLoc').disabled=locationBlocked(); $('btnInv').disabled=false; }
 }
-function openStart(){
-  running=false; show('menu',false); show('start',true);
-  $('btnBack').style.display=W?'block':'none'; $('status').textContent='';
-  if(locationBlocked()){$('btnLoc').disabled=true;
-    $('locNote').textContent='Real-street mazes need the game opened at its own web address: this embedded preview is not allowed to see your location or reach the map service. Invented cities work everywhere.'}
+// Saved places: visited tiles that touch each other count as one place, so neighbouring digs merge by themselves.
+async function listPlaces(){
+  const all=(await DB.all('prog')).filter(p=>p.visited), byKey=new Map(all.map(p=>[p.key,p])), done=new Set(), out=[];
+  for(const p of all){ if(done.has(p.key))continue;
+    const grp=[], st=[p]; done.add(p.key);
+    while(st.length){ const q=st.pop(); grp.push(q);
+      for(let j=-1;j<=1;j++)for(let i=-1;i<=1;i++){ const n=byKey.get(tkey(q.z,q.x+i,q.y+j)); if(n&&!done.has(n.key)){done.add(n.key);st.push(n)} } }
+    grp.sort((a,b)=>b.visited-a.visited);
+    out.push({last:grp[0],tiles:grp.length,found:grp.reduce((a,q)=>a+q.foundN,0),caves:grp.reduce((a,q)=>a+q.caves,0),
+      mapped:Math.round(100*grp.reduce((a,q)=>a+q.seenN,0)/Math.max(1,grp.reduce((a,q)=>a+q.walk,0)))});
+  }
+  return out.sort((a,b)=>b.last.visited-a.last.visited);
 }
-function openMenu(){ if(!W)return; running=false;
+const ago=t=>{const m=(Date.now()-t)/60000; return m<2?'just now':m<60?Math.round(m)+' min ago':m<1440?Math.round(m/60)+' h ago':Math.round(m/1440)+' d ago'};
+async function showPlaces(){
+  const box=$('places'); let list=[]; try{list=await listPlaces()}catch(e){}
+  box.innerHTML=''; $('placesHd').style.display=list.length?'block':'none';
+  for(const pl of list.slice(0,8)){
+    const b=document.createElement('button'); b.className='big';
+    b.textContent=pl.last.label||'Unnamed ground';
+    const sm=document.createElement('small'); sm.textContent=`${pl.tiles} tile${pl.tiles>1?'s':''} · ${pl.found}/${pl.caves} caves · ${pl.mapped}% mapped · ${ago(pl.last.visited)}`; b.appendChild(sm);
+    b.onclick=async()=>{ wakeAudio(); const q=pl.last, st=$('status'); st.textContent='Opening '+(q.label||'your place')+'…';
+      try{ await openPlace(q.z,q.x,q.y,q.pos?{X:q.x+q.pos.x/T,Y:q.y+q.pos.y/T,a:q.pos.a}:null,null,true) }
+      catch(e){ st.textContent='Couldn\'t open it ('+e.message+').' } };
+    box.appendChild(b);
+  }
+}
+function openStart(){
+  running=false; saveProgress(); show('menu',false); show('start',true);
+  $('btnBack').style.display=W?'block':'none'; $('status').textContent='';
+  showPlaces();
+  if(locationBlocked()){$('btnLoc').disabled=true;
+    $('locNote').textContent='Real-street mazes need the game opened at its own web address: this embedded preview is not allowed to see your location or reach the map service. Invented cities work everywhere, but are not saved.'}
+}
+function openMenu(){ if(!W)return; running=false; saveProgress();
   $('menuTitle').textContent=W.real?'Under your streets':'Under '+W.title;
-  $('menuInfo').textContent=`${W.found} of ${W.caves.length} food caves found · ${pct()}% mapped · ${Math.round(walked*CELL_M)} m walked`;
-  $('attrib').textContent=W.real?'Map data © OpenStreetMap contributors.':'This town is invented. Any resemblance to real streets is a coincidence.';
+  $('menuInfo').textContent=`${W.found} of ${W.caves.length} food caves found · ${pct()}% mapped · ${Math.round(walked*W.cellM)} m walked · surfaced ${surfaced}, made it back ${escapes}`;
+  $('attrib').textContent=W.real?'Map data © OpenStreetMap contributors. '+(DB.ok?'Progress is saved in this browser.':'This browser would not open a database, so progress lasts only until you close the page.'):(lastNote||'This town is invented. Any resemblance to real streets is a coincidence.');
   show('menu',true) }
 function openMap(){ if(!W)return; running=false; drawBig(); show('bigmap',true) }
 function closeMap(){ show('bigmap',false); running=true }
@@ -769,15 +1249,22 @@ $('btnBack').onclick=()=>{show('start',false);running=true};
 $('btnResume').onclick=()=>{show('menu',false);running=true};
 $('btnNew').onclick=openStart;
 $('btnSound').onclick=()=>{soundOn=!soundOn;$('btnSound').textContent='Sound: '+(soundOn?'on':'off')};
+$('btnSky').onclick=()=>{skyMode=(skyMode+1)%4;$('btnSky').textContent='Sky: '+['real time','day','dusk','night'][skyMode];setSky()};
 $('menuBtn').onclick=openMenu;
 mini.onclick=openMap;
 $('btnMapClose').onclick=closeMap;
 window.addEventListener('resize',resize);
-document.addEventListener('visibilitychange',()=>{if(document.hidden){P.v=0;pendingWalk=0}});
+document.addEventListener('visibilitychange',()=>{if(document.hidden){P.v=0;pendingWalk=0;saveProgress()}});
+window.addEventListener('pagehide',()=>{saveProgress()});
+// sudoku board and number pad
+for(let i=0;i<81;i++){const b=document.createElement('button');b.className='sc';b.onclick=()=>{SUD.sel=i;sudokuDraw()};$('sudoku').appendChild(b)}
+for(const d of [1,2,3,4,5,6,7,8,9,0]){const b=document.createElement('button');b.textContent=d||'⌫';b.setAttribute('aria-label',d?String(d):'Erase');b.onclick=()=>sudokuPut(d);$('sudPad').appendChild(b)}
 
-resize(); openStart(); requestAnimationFrame(frame);
+resize(); DB.open().then(openStart); requestAnimationFrame(frame);
 // test hooks
-window.__us={P,get W(){return W},inventCity,osmToSrc,startWorld,buildWorld};
+window.__us={drivesOnLeft,osmApiToEls,cars,teleport,get realm(){return realm},P,get W(){return W},get G(){return G},inventCity,startWorld,buildWorld,
+  elsToTiles,tilesToSrc,tileCache,progCache,openPlace,saveProgress,listPlaces,DB,SUD,sudokuPut,sudokuNew,sudokuCount,gameOver,zFor,lon2x,lat2y,x2lon,y2lat,T,N,
+  setFetch(f){fetchOSM=f}};
 })();
 </script>
 </body>
