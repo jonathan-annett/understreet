@@ -1,6 +1,33 @@
+// Made by the Cloudflare Angel. Keep routes and custom domains out of this file.
 {
   "name": "understreet",
   "compatibility_date": "2026-11-01",
-  "assets": { "directory": "./public" },
-  "preview_urls": false
+  "preview_urls": false,
+  "main": "src/index.js",
+  "assets": {
+    "directory": "./public",
+    "binding": "ASSETS"
+  },
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "OBJECT",
+        "class_name": "MyDurableObject"
+      }
+    ]
+  },
+  "migrations": [
+    {
+      "tag": "v1",
+      "new_sqlite_classes": [
+        "MyDurableObject"
+      ]
+    }
+  ],
+  "r2_buckets": [
+    {
+      "binding": "BUCKET",
+      "bucket_name": "understreet"
+    }
+  ]
 }
